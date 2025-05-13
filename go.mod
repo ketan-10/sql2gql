@@ -2,4 +2,6 @@ module github.com/ketan-10/mysql2graphql
 
 go 1.21.3
 
-require github.com/go-sql-driver/mysql v1.7.1
+require github.com/go-sql-driver/mysql v1.9.2
+
+require filippo.io/edwards25519 v1.1.0 // indirect
