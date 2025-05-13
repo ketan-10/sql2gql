@@ -18,6 +18,7 @@ type Args struct {
 	GeneratedDir string
 	Generated    []*GeneratedTemplate
 }
+
 func GetDefaultArgs() *Args {
 	return &Args{
 		GeneratedDir: "mysql2gql",
@@ -26,15 +27,15 @@ func GetDefaultArgs() *Args {
 
 type GeneratedTemplate struct {
 	TemplateType templates.TemplateType
-	FileName     string
+	OutFileName  string
 	Buffer       *bytes.Buffer
 }
 
-func (arg *Args) ExecuteTemplate(tt templates.TemplateType, fileName string, obj interface{}) error {
+func (arg *Args) ExecuteTemplate(tt templates.TemplateType, outFilename string, obj interface{}) error {
 
 	genTmp := &GeneratedTemplate{
 		TemplateType: tt,
-		FileName:     fileName,
+		OutFileName:  outFilename,
 		Buffer:       new(bytes.Buffer),
 	}
 
