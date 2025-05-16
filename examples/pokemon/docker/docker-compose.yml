@@ -1,0 +1,10 @@
+version: "3.3"
+services:
+  db:
+    image: mysql:9.3
+    container_name: db
+    command: --character-set-server=utf8mb4
+    ports:
+      - "3306:3306"
+    env_file:
+      - docker.env
