@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/elgris/sqrl"
@@ -16,7 +15,6 @@ type IDb interface {
 	Select(ctx context.Context, dest interface{}, sqlizer sqrl.Sqlizer) error
 	Get(ctx context.Context, dest interface{}, sqlizer sqrl.Sqlizer) error
 	Exec(ctx context.Context, sqlizer sqrl.Sqlizer) (sql.Result, error)
-	BeginTxx(ctx context.Context) (*sqlx.Tx, error)
 }
 
 type DBOptions struct {
@@ -53,11 +51,7 @@ func (db *DB) Get(ctx context.Context, dest interface{}, sqlizer sqrl.Sqlizer) e
 		return err
 	}
 
-	if tx := context_manager.GetTransactionContext(ctx); tx != nil {
-		err = tx.GetContext(ctx, dest, query, args...)
-	} else {
-		err = db.DB.GetContext(ctx, dest, query, args...)
-	}
+	err = db.DB.GetContext(ctx, dest, query, args...)
 
 	if err != nil {
 		return err
@@ -71,12 +65,7 @@ func (db *DB) Select(ctx context.Context, dest interface{}, sqlizer sqrl.Sqlizer
 		return err
 	}
 
-	if tx := context_manager.GetTransactionContext(ctx); tx != nil {
-		err = tx.SelectContext(ctx, dest, query, args...)
-	} else {
-		err = db.DB.SelectContext(ctx, dest, query, args...)
-	}
-
+	err = db.DB.SelectContext(ctx, dest, query, args...)
 	if err != nil {
 		return err
 	}
@@ -97,12 +86,7 @@ func (db *DB) Exec(ctx context.Context, sqlizer sqrl.Sqlizer) (sql.Result, error
 	}
 
 	var res sql.Result
-	if tx := context_manager.GetTransactionContext(ctx); tx != nil {
-		res, err = tx.ExecContext(ctx, query, args...)
-	} else {
-		res, err = db.DB.ExecContext(ctx, query, args...)
-	}
-
+	res, err = db.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -111,38 +95,4 @@ func (db *DB) Exec(ctx context.Context, sqlizer sqrl.Sqlizer) (sql.Result, error
 	// err = db.FileGen.Write(sqlizer)
 
 	return res, err
-}
-
-func (db *DB) BeginTxx(ctx context.Context) (*sqlx.Tx, error) {
-	return db.DB.BeginTxx(ctx, nil)
-}
-
-// Transaction
-
-func WrapInTransaction(ctx context.Context, db IDb, f func(ctx context.Context) error) error {
-
-	// if transaction already exists
-	tx := context_manager.GetTransactionContext(ctx)
-	if tx != nil {
-		return f(ctx)
-	}
-
-	tx, err := db.BeginTxx(ctx)
-	if err != nil {
-		return err
-	}
-
-	// handle traction
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-			fmt.Println("Rollback due to panic")
-			panic(r)
-		}
-		tx.Commit()
-
-	}()
-
-	newContext := context_manager.WithTransaction(ctx, tx)
-	return f(newContext)
 }
