@@ -14,8 +14,8 @@ import (
 type IPokemonTypesRltsRepository interface {
 
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
-	PokemonByPokemonID(ctx context.Context, obj *table.PokemonTypes, filter *table.PokemonFilter) (*table.Pokemon, error)
-	TypesByTypeID(ctx context.Context, obj *table.PokemonTypes, filter *table.TypesFilter) (*table.Types, error)
+	PokemonThroughPokemonID(ctx context.Context, obj *table.PokemonTypes, filter *table.PokemonFilter) (*table.Pokemon, error)
+	TypesThroughTypeID(ctx context.Context, obj *table.PokemonTypes, filter *table.TypesFilter) (*table.Types, error)
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
 
@@ -32,7 +32,7 @@ var NewPokemonTypesRltsRepository = wire.NewSet(
 	wire.Bind(new(IPokemonTypesRltsRepository), new(*PokemonTypesRltsRepository)),
 )
 
-func (ptr *PokemonTypesRltsRepository) PokemonByPokemonID(ctx context.Context, obj *table.PokemonTypes, filter *table.PokemonFilter) (*table.Pokemon, error) {
+func (ptr *PokemonTypesRltsRepository) PokemonThroughPokemonID(ctx context.Context, obj *table.PokemonTypes, filter *table.PokemonFilter) (*table.Pokemon, error) {
 	if obj == nil {
 		return nil, nil
 	}
@@ -53,7 +53,7 @@ func (ptr *PokemonTypesRltsRepository) PokemonByPokemonID(ctx context.Context, o
 	}
 	return &result.Data[0], nil
 }
-func (ptr *PokemonTypesRltsRepository) TypesByTypeID(ctx context.Context, obj *table.PokemonTypes, filter *table.TypesFilter) (*table.Types, error) {
+func (ptr *PokemonTypesRltsRepository) TypesThroughTypeID(ctx context.Context, obj *table.PokemonTypes, filter *table.TypesFilter) (*table.Types, error) {
 	if obj == nil {
 		return nil, nil
 	}

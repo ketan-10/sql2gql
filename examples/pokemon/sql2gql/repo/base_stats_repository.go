@@ -26,13 +26,13 @@ type IBaseStatsRepository interface {
 
 	FindAllBaseStats(ctx context.Context, bs *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
 	FindAllBaseStatsWithSuffix(ctx context.Context, bs *table.BaseStatsFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListBaseStats, error)
+	BaseStatsByID(ctx context.Context, iD int, filter *table.BaseStatsFilter) (*table.BaseStats, error)
+
+	BaseStatsByIDWithSuffix(ctx context.Context, iD int, filter *table.BaseStatsFilter, suffixes ...sq.Sqlizer) (*table.BaseStats, error)
 
 	BaseStatsByFkPokemon(ctx context.Context, fkPokemon int, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
 
 	BaseStatsByFkPokemonWithSuffix(ctx context.Context, fkPokemon int, filter *table.BaseStatsFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListBaseStats, error)
-	BaseStatsByID(ctx context.Context, iD int, filter *table.BaseStatsFilter) (table.BaseStats, error)
-
-	BaseStatsByIDWithSuffix(ctx context.Context, iD int, filter *table.BaseStatsFilter, suffixes ...sq.Sqlizer) (table.BaseStats, error)
 }
 
 type IBaseStatsRepositoryQueryBuilder interface {
@@ -350,6 +350,28 @@ func (bsr *BaseStatsRepository) FindAllBaseStatsWithSuffix(ctx context.Context, 
 
 	return &list, err
 }
+func (bsr *BaseStatsRepository) BaseStatsByID(ctx context.Context, iD int, filter *table.BaseStatsFilter) (*table.BaseStats, error) {
+	return bsr.BaseStatsByIDWithSuffix(ctx, iD, filter)
+}
+
+func (bsr *BaseStatsRepository) BaseStatsByIDWithSuffix(ctx context.Context, iD int, filter *table.BaseStatsFilter, suffixes ...sq.Sqlizer) (*table.BaseStats, error) {
+	var err error
+
+	// sql query
+	qb, err := bsr.FindAllBaseStatsBaseQuery(ctx, filter, "`base_stats`.*", suffixes...)
+	if err != nil {
+		return &table.BaseStats{}, err
+	}
+	qb = qb.Where(sq.Eq{"`base_stats`.`id`": iD})
+
+	// run query
+	bs := table.BaseStats{}
+	err = bsr.DB.Get(ctx, &bs, qb)
+	if err != nil {
+		return &table.BaseStats{}, err
+	}
+	return &bs, nil
+}
 
 func (bsr *BaseStatsRepository) BaseStatsByFkPokemon(ctx context.Context, fkPokemon int, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error) {
 	return bsr.BaseStatsByFkPokemonWithSuffix(ctx, fkPokemon, filter, pagination)
@@ -395,26 +417,4 @@ func (bsr *BaseStatsRepository) BaseStatsByFkPokemonWithSuffix(ctx context.Conte
 
 	return &list, nil
 
-}
-func (bsr *BaseStatsRepository) BaseStatsByID(ctx context.Context, iD int, filter *table.BaseStatsFilter) (table.BaseStats, error) {
-	return bsr.BaseStatsByIDWithSuffix(ctx, iD, filter)
-}
-
-func (bsr *BaseStatsRepository) BaseStatsByIDWithSuffix(ctx context.Context, iD int, filter *table.BaseStatsFilter, suffixes ...sq.Sqlizer) (table.BaseStats, error) {
-	var err error
-
-	// sql query
-	qb, err := bsr.FindAllBaseStatsBaseQuery(ctx, filter, "`base_stats`.*", suffixes...)
-	if err != nil {
-		return table.BaseStats{}, err
-	}
-	qb = qb.Where(sq.Eq{"`base_stats`.`id`": iD})
-
-	// run query
-	bs := table.BaseStats{}
-	err = bsr.DB.Get(ctx, &bs, qb)
-	if err != nil {
-		return table.BaseStats{}, err
-	}
-	return bs, nil
 }

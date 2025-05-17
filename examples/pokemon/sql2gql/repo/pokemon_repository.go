@@ -30,9 +30,9 @@ type IPokemonRepository interface {
 	PokemonByPokemonName(ctx context.Context, pokemonName string, filter *table.PokemonFilter, pagination *internal.Pagination) (*table.ListPokemon, error)
 
 	PokemonByPokemonNameWithSuffix(ctx context.Context, pokemonName string, filter *table.PokemonFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemon, error)
-	PokemonByID(ctx context.Context, iD int, filter *table.PokemonFilter) (table.Pokemon, error)
+	PokemonByID(ctx context.Context, iD int, filter *table.PokemonFilter) (*table.Pokemon, error)
 
-	PokemonByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonFilter, suffixes ...sq.Sqlizer) (table.Pokemon, error)
+	PokemonByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonFilter, suffixes ...sq.Sqlizer) (*table.Pokemon, error)
 }
 
 type IPokemonRepositoryQueryBuilder interface {
@@ -366,17 +366,17 @@ func (pr *PokemonRepository) PokemonByPokemonNameWithSuffix(ctx context.Context,
 	return &list, nil
 
 }
-func (pr *PokemonRepository) PokemonByID(ctx context.Context, iD int, filter *table.PokemonFilter) (table.Pokemon, error) {
+func (pr *PokemonRepository) PokemonByID(ctx context.Context, iD int, filter *table.PokemonFilter) (*table.Pokemon, error) {
 	return pr.PokemonByIDWithSuffix(ctx, iD, filter)
 }
 
-func (pr *PokemonRepository) PokemonByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonFilter, suffixes ...sq.Sqlizer) (table.Pokemon, error) {
+func (pr *PokemonRepository) PokemonByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonFilter, suffixes ...sq.Sqlizer) (*table.Pokemon, error) {
 	var err error
 
 	// sql query
 	qb, err := pr.FindAllPokemonBaseQuery(ctx, filter, "`pokemon`.*", suffixes...)
 	if err != nil {
-		return table.Pokemon{}, err
+		return &table.Pokemon{}, err
 	}
 	qb = qb.Where(sq.Eq{"`pokemon`.`id`": iD})
 
@@ -384,7 +384,7 @@ func (pr *PokemonRepository) PokemonByIDWithSuffix(ctx context.Context, iD int, 
 	p := table.Pokemon{}
 	err = pr.DB.Get(ctx, &p, qb)
 	if err != nil {
-		return table.Pokemon{}, err
+		return &table.Pokemon{}, err
 	}
-	return p, nil
+	return &p, nil
 }

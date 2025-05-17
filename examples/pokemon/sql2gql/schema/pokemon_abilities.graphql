@@ -9,14 +9,10 @@ type PokemonAbilities {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByFkPokemon(filter: PokemonFilter): Pokemon
-    abilitiesByFkAbility(filter: AbilitiesFilter): Abilities
-
-
-
-
+# ManyToOne
+    pokemonThroughFkPokemon(filter: PokemonFilter): Pokemon
+    abilitiesThroughFkAbility(filter: AbilitiesFilter): Abilities
+# OneToMany
 }
 input PokemonAbilitiesFilter {
     iD: FilterOnField

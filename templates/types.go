@@ -6,6 +6,7 @@ const (
 	ENUM TemplateType = iota
 	TABLE
 	REPO
+	QUERY_MUTATION
 	GO_WIRE
 	GRAPH_SCHEMA
 	RLTS
@@ -22,6 +23,8 @@ func (tt *TemplateType) String() string {
 		return "table"
 	case REPO:
 		return "repo"
+	case QUERY_MUTATION:
+		return "query_mutation"
 	case GO_WIRE:
 		return "go_wire"
 	case RLTS:
@@ -43,7 +46,7 @@ func (tt *TemplateType) Extension() string {
 	switch *tt {
 	case ENUM, TABLE, REPO, GO_WIRE, RLTS, GO_RESOLVER:
 		return "go"
-	case GRAPH_SCHEMA, ENUM_SCALAR:
+	case GRAPH_SCHEMA, ENUM_SCALAR, QUERY_MUTATION:
 		return "graphql"
 	case GQLGEN:
 		return "yml"
@@ -53,7 +56,7 @@ func (tt *TemplateType) Extension() string {
 }
 func (tt *TemplateType) PlaceAtRoot() bool {
 	switch *tt {
-	case GO_WIRE, GQLGEN, ENUM_SCALAR, GO_RESOLVER:
+	case GO_WIRE, GQLGEN, ENUM_SCALAR, GO_RESOLVER, QUERY_MUTATION:
 		return true
 	}
 

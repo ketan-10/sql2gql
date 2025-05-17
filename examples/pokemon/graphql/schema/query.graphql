@@ -1,5 +1,0 @@
-type Query {
-    
-    findAllPokemon(filter: PokemonFilter, pagination: Pagination): ListPokemon!
-
-}

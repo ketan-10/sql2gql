@@ -263,6 +263,13 @@ func (l *ListPokemonEvolutionMatchup) Find(f func(item PokemonEvolutionMatchup) 
 	}
 	return PokemonEvolutionMatchup{}, false
 }
+func (l *ListPokemonEvolutionMatchup) MapByID() (m map[int]PokemonEvolutionMatchup) {
+	m = make(map[int]PokemonEvolutionMatchup, len(l.Data))
+	for _, item := range l.Data {
+		m[item.ID] = item
+	}
+	return m
+}
 
 func (l *ListPokemonEvolutionMatchup) MapByPokemonID() (m map[int]ListPokemonEvolutionMatchup) {
 	m = make(map[int]ListPokemonEvolutionMatchup)
@@ -275,14 +282,6 @@ func (l *ListPokemonEvolutionMatchup) MapByPokemonID() (m map[int]ListPokemonEvo
 	for k, v := range m {
 		v.TotalCount = len(v.Data)
 		m[k] = v
-	}
-	return m
-}
-
-func (l *ListPokemonEvolutionMatchup) MapByID() (m map[int]PokemonEvolutionMatchup) {
-	m = make(map[int]PokemonEvolutionMatchup, len(l.Data))
-	for _, item := range l.Data {
-		m[item.ID] = item
 	}
 	return m
 }

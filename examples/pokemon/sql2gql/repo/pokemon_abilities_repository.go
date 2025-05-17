@@ -26,6 +26,9 @@ type IPokemonAbilitiesRepository interface {
 
 	FindAllPokemonAbilities(ctx context.Context, pa *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
 	FindAllPokemonAbilitiesWithSuffix(ctx context.Context, pa *table.PokemonAbilitiesFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemonAbilities, error)
+	PokemonAbilitiesByID(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter) (*table.PokemonAbilities, error)
+
+	PokemonAbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter, suffixes ...sq.Sqlizer) (*table.PokemonAbilities, error)
 
 	PokemonAbilitiesByFkAbility(ctx context.Context, fkAbility int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
 
@@ -34,9 +37,6 @@ type IPokemonAbilitiesRepository interface {
 	PokemonAbilitiesByFkPokemon(ctx context.Context, fkPokemon int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
 
 	PokemonAbilitiesByFkPokemonWithSuffix(ctx context.Context, fkPokemon int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemonAbilities, error)
-	PokemonAbilitiesByID(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter) (table.PokemonAbilities, error)
-
-	PokemonAbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter, suffixes ...sq.Sqlizer) (table.PokemonAbilities, error)
 }
 
 type IPokemonAbilitiesRepositoryQueryBuilder interface {
@@ -324,6 +324,28 @@ func (par *PokemonAbilitiesRepository) FindAllPokemonAbilitiesWithSuffix(ctx con
 
 	return &list, err
 }
+func (par *PokemonAbilitiesRepository) PokemonAbilitiesByID(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter) (*table.PokemonAbilities, error) {
+	return par.PokemonAbilitiesByIDWithSuffix(ctx, iD, filter)
+}
+
+func (par *PokemonAbilitiesRepository) PokemonAbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter, suffixes ...sq.Sqlizer) (*table.PokemonAbilities, error) {
+	var err error
+
+	// sql query
+	qb, err := par.FindAllPokemonAbilitiesBaseQuery(ctx, filter, "`pokemon_abilities`.*", suffixes...)
+	if err != nil {
+		return &table.PokemonAbilities{}, err
+	}
+	qb = qb.Where(sq.Eq{"`pokemon_abilities`.`id`": iD})
+
+	// run query
+	pa := table.PokemonAbilities{}
+	err = par.DB.Get(ctx, &pa, qb)
+	if err != nil {
+		return &table.PokemonAbilities{}, err
+	}
+	return &pa, nil
+}
 
 func (par *PokemonAbilitiesRepository) PokemonAbilitiesByFkAbility(ctx context.Context, fkAbility int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error) {
 	return par.PokemonAbilitiesByFkAbilityWithSuffix(ctx, fkAbility, filter, pagination)
@@ -415,26 +437,4 @@ func (par *PokemonAbilitiesRepository) PokemonAbilitiesByFkPokemonWithSuffix(ctx
 
 	return &list, nil
 
-}
-func (par *PokemonAbilitiesRepository) PokemonAbilitiesByID(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter) (table.PokemonAbilities, error) {
-	return par.PokemonAbilitiesByIDWithSuffix(ctx, iD, filter)
-}
-
-func (par *PokemonAbilitiesRepository) PokemonAbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter, suffixes ...sq.Sqlizer) (table.PokemonAbilities, error) {
-	var err error
-
-	// sql query
-	qb, err := par.FindAllPokemonAbilitiesBaseQuery(ctx, filter, "`pokemon_abilities`.*", suffixes...)
-	if err != nil {
-		return table.PokemonAbilities{}, err
-	}
-	qb = qb.Where(sq.Eq{"`pokemon_abilities`.`id`": iD})
-
-	// run query
-	pa := table.PokemonAbilities{}
-	err = par.DB.Get(ctx, &pa, qb)
-	if err != nil {
-		return table.PokemonAbilities{}, err
-	}
-	return pa, nil
 }

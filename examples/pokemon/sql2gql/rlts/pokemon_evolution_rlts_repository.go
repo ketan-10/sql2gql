@@ -14,7 +14,7 @@ import (
 type IPokemonEvolutionRltsRepository interface {
 
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
-	PokemonEvolutionMatchupByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolution, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error)
+	PokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolution, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error)
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
 
@@ -29,7 +29,7 @@ var NewPokemonEvolutionRltsRepository = wire.NewSet(
 	wire.Bind(new(IPokemonEvolutionRltsRepository), new(*PokemonEvolutionRltsRepository)),
 )
 
-func (per *PokemonEvolutionRltsRepository) PokemonEvolutionMatchupByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolution, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error) {
+func (per *PokemonEvolutionRltsRepository) PokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolution, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error) {
 	if obj == nil {
 		return nil, nil
 	}

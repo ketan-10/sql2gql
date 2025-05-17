@@ -6,18 +6,14 @@ type {{ $tableNameCamel }} {
 {{- range .Table.Columns}}
     {{ camelCaseVar .ColumnName }}: {{if .IsEnum }} {{camelCase .TableName}} {{- camelCase .ColumnName}} {{else}}{{.GraphQLType}} {{end}}{{- if .NotNullable }}!{{- end }}
 {{- end }}
-
-{{/* ManyToOne */}}
+# ManyToOne
 {{- range .ForeignKeys }}
-    {{ camelCaseVar .RefTableName }}By{{ camelCase .ColumnName }}(filter: {{ camelCase .RefTableName }}Filter): {{ camelCase .RefTableName }}
+    {{ camelCaseVar .RefTableName }}Through{{ camelCase .ColumnName }}(filter: {{ camelCase .RefTableName }}Filter): {{ camelCase .RefTableName }}
 {{- end }}
-
-
-{{/* OneToMany */}}
+# OneToMany
 {{- range .ForeignKeysRef }}
-    {{ camelCaseVar .Table.TableName }}By{{ camelCase .ColumnName }}(filter: {{ camelCase .Table.TableName }}Filter, pagination: Pagination): List{{ camelCase .Table.TableName }}! 
+    {{ camelCaseVar .Table.TableName }}Through{{ camelCase .ColumnName }}(filter: {{ camelCase .Table.TableName }}Filter, pagination: Pagination): List{{ camelCase .Table.TableName }}! 
 {{- end }}
-
 }
 input {{ $tableNameCamel }}Filter {
 {{- range .Table.Columns }}

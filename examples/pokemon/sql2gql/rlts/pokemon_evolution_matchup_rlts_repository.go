@@ -14,10 +14,10 @@ import (
 type IPokemonEvolutionMatchupRltsRepository interface {
 
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
-	PokemonByPokemonID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonFilter) (*table.Pokemon, error)
+	PokemonThroughPokemonID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonFilter) (*table.Pokemon, error)
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
-	PokemonEvolutionByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
+	PokemonEvolutionThroughEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
 }
 
 type PokemonEvolutionMatchupRltsRepository struct {
@@ -31,7 +31,7 @@ var NewPokemonEvolutionMatchupRltsRepository = wire.NewSet(
 	wire.Bind(new(IPokemonEvolutionMatchupRltsRepository), new(*PokemonEvolutionMatchupRltsRepository)),
 )
 
-func (pemr *PokemonEvolutionMatchupRltsRepository) PokemonByPokemonID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonFilter) (*table.Pokemon, error) {
+func (pemr *PokemonEvolutionMatchupRltsRepository) PokemonThroughPokemonID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonFilter) (*table.Pokemon, error) {
 	if obj == nil {
 		return nil, nil
 	}
@@ -52,7 +52,7 @@ func (pemr *PokemonEvolutionMatchupRltsRepository) PokemonByPokemonID(ctx contex
 	}
 	return &result.Data[0], nil
 }
-func (pemr *PokemonEvolutionMatchupRltsRepository) PokemonEvolutionByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error) {
+func (pemr *PokemonEvolutionMatchupRltsRepository) PokemonEvolutionThroughEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error) {
 	if obj == nil {
 		return &table.ListPokemonEvolution{}, nil
 	}

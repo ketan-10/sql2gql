@@ -26,13 +26,13 @@ type IPokemonEvolutionMatchupRepository interface {
 
 	FindAllPokemonEvolutionMatchup(ctx context.Context, pem *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
 	FindAllPokemonEvolutionMatchupWithSuffix(ctx context.Context, pem *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemonEvolutionMatchup, error)
+	PokemonEvolutionMatchupByID(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error)
+
+	PokemonEvolutionMatchupByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter, suffixes ...sq.Sqlizer) (*table.PokemonEvolutionMatchup, error)
 
 	PokemonEvolutionMatchupByPokemonID(ctx context.Context, pokemonID int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
 
 	PokemonEvolutionMatchupByPokemonIDWithSuffix(ctx context.Context, pokemonID int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemonEvolutionMatchup, error)
-	PokemonEvolutionMatchupByID(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter) (table.PokemonEvolutionMatchup, error)
-
-	PokemonEvolutionMatchupByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter, suffixes ...sq.Sqlizer) (table.PokemonEvolutionMatchup, error)
 }
 
 type IPokemonEvolutionMatchupRepositoryQueryBuilder interface {
@@ -340,6 +340,28 @@ func (pemr *PokemonEvolutionMatchupRepository) FindAllPokemonEvolutionMatchupWit
 
 	return &list, err
 }
+func (pemr *PokemonEvolutionMatchupRepository) PokemonEvolutionMatchupByID(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error) {
+	return pemr.PokemonEvolutionMatchupByIDWithSuffix(ctx, iD, filter)
+}
+
+func (pemr *PokemonEvolutionMatchupRepository) PokemonEvolutionMatchupByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter, suffixes ...sq.Sqlizer) (*table.PokemonEvolutionMatchup, error) {
+	var err error
+
+	// sql query
+	qb, err := pemr.FindAllPokemonEvolutionMatchupBaseQuery(ctx, filter, "`pokemon_evolution_matchup`.*", suffixes...)
+	if err != nil {
+		return &table.PokemonEvolutionMatchup{}, err
+	}
+	qb = qb.Where(sq.Eq{"`pokemon_evolution_matchup`.`id`": iD})
+
+	// run query
+	pem := table.PokemonEvolutionMatchup{}
+	err = pemr.DB.Get(ctx, &pem, qb)
+	if err != nil {
+		return &table.PokemonEvolutionMatchup{}, err
+	}
+	return &pem, nil
+}
 
 func (pemr *PokemonEvolutionMatchupRepository) PokemonEvolutionMatchupByPokemonID(ctx context.Context, pokemonID int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error) {
 	return pemr.PokemonEvolutionMatchupByPokemonIDWithSuffix(ctx, pokemonID, filter, pagination)
@@ -385,26 +407,4 @@ func (pemr *PokemonEvolutionMatchupRepository) PokemonEvolutionMatchupByPokemonI
 
 	return &list, nil
 
-}
-func (pemr *PokemonEvolutionMatchupRepository) PokemonEvolutionMatchupByID(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter) (table.PokemonEvolutionMatchup, error) {
-	return pemr.PokemonEvolutionMatchupByIDWithSuffix(ctx, iD, filter)
-}
-
-func (pemr *PokemonEvolutionMatchupRepository) PokemonEvolutionMatchupByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter, suffixes ...sq.Sqlizer) (table.PokemonEvolutionMatchup, error) {
-	var err error
-
-	// sql query
-	qb, err := pemr.FindAllPokemonEvolutionMatchupBaseQuery(ctx, filter, "`pokemon_evolution_matchup`.*", suffixes...)
-	if err != nil {
-		return table.PokemonEvolutionMatchup{}, err
-	}
-	qb = qb.Where(sq.Eq{"`pokemon_evolution_matchup`.`id`": iD})
-
-	// run query
-	pem := table.PokemonEvolutionMatchup{}
-	err = pemr.DB.Get(ctx, &pem, qb)
-	if err != nil {
-		return table.PokemonEvolutionMatchup{}, err
-	}
-	return pem, nil
 }

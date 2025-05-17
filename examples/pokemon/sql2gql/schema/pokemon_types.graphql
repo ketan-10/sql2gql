@@ -8,14 +8,10 @@ type PokemonTypes {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByPokemonID(filter: PokemonFilter): Pokemon
-    typesByTypeID(filter: TypesFilter): Types
-
-
-
-
+# ManyToOne
+    pokemonThroughPokemonID(filter: PokemonFilter): Pokemon
+    typesThroughTypeID(filter: TypesFilter): Types
+# OneToMany
 }
 input PokemonTypesFilter {
     iD: FilterOnField

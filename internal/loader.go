@@ -103,6 +103,12 @@ func (lt *LoaderImp) LoadSchema(args *Args) error {
 		}
 	}
 
+	// execute repos
+	err = args.ExecuteTemplate(templates.QUERY_MUTATION, "query_mutation", tableWithIndexes)
+	if err != nil {
+		return err
+	}
+	
 	// execute rlts
 	for _, tableRelation := range tableRelations {
 		uniqueTableNames := getUniqueRepoDependeciesTableNameForRLTS(tableRelation)

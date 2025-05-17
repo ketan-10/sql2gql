@@ -6,13 +6,9 @@ type Types {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-
-
-
-    pokemonTypesByTypeID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
-
+# ManyToOne
+# OneToMany
+    pokemonTypesThroughTypeID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
 }
 input TypesFilter {
     iD: FilterOnField

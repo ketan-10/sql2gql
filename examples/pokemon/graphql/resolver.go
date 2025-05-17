@@ -14,6 +14,6 @@ func (r *Resolver) Query() gen.QueryResolver {
 	return r
 }
 
-// func (r *Resolver) Mutation() gen.MutationResolver {
-// 	return r
-// }
+func (r *Resolver) Mutation() gen.MutationResolver {
+	return r
+}

@@ -30,9 +30,9 @@ type IPokemonTypesRepository interface {
 	PokemonTypesByPokemonID(ctx context.Context, pokemonID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
 
 	PokemonTypesByPokemonIDWithSuffix(ctx context.Context, pokemonID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemonTypes, error)
-	PokemonTypesByID(ctx context.Context, iD int, filter *table.PokemonTypesFilter) (table.PokemonTypes, error)
+	PokemonTypesByID(ctx context.Context, iD int, filter *table.PokemonTypesFilter) (*table.PokemonTypes, error)
 
-	PokemonTypesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonTypesFilter, suffixes ...sq.Sqlizer) (table.PokemonTypes, error)
+	PokemonTypesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonTypesFilter, suffixes ...sq.Sqlizer) (*table.PokemonTypes, error)
 
 	PokemonTypesByTypeID(ctx context.Context, typeID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
 
@@ -360,17 +360,17 @@ func (ptr *PokemonTypesRepository) PokemonTypesByPokemonIDWithSuffix(ctx context
 	return &list, nil
 
 }
-func (ptr *PokemonTypesRepository) PokemonTypesByID(ctx context.Context, iD int, filter *table.PokemonTypesFilter) (table.PokemonTypes, error) {
+func (ptr *PokemonTypesRepository) PokemonTypesByID(ctx context.Context, iD int, filter *table.PokemonTypesFilter) (*table.PokemonTypes, error) {
 	return ptr.PokemonTypesByIDWithSuffix(ctx, iD, filter)
 }
 
-func (ptr *PokemonTypesRepository) PokemonTypesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonTypesFilter, suffixes ...sq.Sqlizer) (table.PokemonTypes, error) {
+func (ptr *PokemonTypesRepository) PokemonTypesByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonTypesFilter, suffixes ...sq.Sqlizer) (*table.PokemonTypes, error) {
 	var err error
 
 	// sql query
 	qb, err := ptr.FindAllPokemonTypesBaseQuery(ctx, filter, "`pokemon_types`.*", suffixes...)
 	if err != nil {
-		return table.PokemonTypes{}, err
+		return &table.PokemonTypes{}, err
 	}
 	qb = qb.Where(sq.Eq{"`pokemon_types`.`id`": iD})
 
@@ -378,9 +378,9 @@ func (ptr *PokemonTypesRepository) PokemonTypesByIDWithSuffix(ctx context.Contex
 	pt := table.PokemonTypes{}
 	err = ptr.DB.Get(ctx, &pt, qb)
 	if err != nil {
-		return table.PokemonTypes{}, err
+		return &table.PokemonTypes{}, err
 	}
-	return pt, nil
+	return &pt, nil
 }
 
 func (ptr *PokemonTypesRepository) PokemonTypesByTypeID(ctx context.Context, typeID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error) {

@@ -26,13 +26,13 @@ type IPokemonEvolutionRepository interface {
 
 	FindAllPokemonEvolution(ctx context.Context, pe *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
 	FindAllPokemonEvolutionWithSuffix(ctx context.Context, pe *table.PokemonEvolutionFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemonEvolution, error)
+	PokemonEvolutionByID(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter) (*table.PokemonEvolution, error)
+
+	PokemonEvolutionByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter, suffixes ...sq.Sqlizer) (*table.PokemonEvolution, error)
 
 	PokemonEvolutionByEvolvedSpeciesID(ctx context.Context, evolvedSpeciesID int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
 
 	PokemonEvolutionByEvolvedSpeciesIDWithSuffix(ctx context.Context, evolvedSpeciesID int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListPokemonEvolution, error)
-	PokemonEvolutionByID(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter) (table.PokemonEvolution, error)
-
-	PokemonEvolutionByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter, suffixes ...sq.Sqlizer) (table.PokemonEvolution, error)
 }
 
 type IPokemonEvolutionRepositoryQueryBuilder interface {
@@ -300,6 +300,28 @@ func (per *PokemonEvolutionRepository) FindAllPokemonEvolutionWithSuffix(ctx con
 
 	return &list, err
 }
+func (per *PokemonEvolutionRepository) PokemonEvolutionByID(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter) (*table.PokemonEvolution, error) {
+	return per.PokemonEvolutionByIDWithSuffix(ctx, iD, filter)
+}
+
+func (per *PokemonEvolutionRepository) PokemonEvolutionByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter, suffixes ...sq.Sqlizer) (*table.PokemonEvolution, error) {
+	var err error
+
+	// sql query
+	qb, err := per.FindAllPokemonEvolutionBaseQuery(ctx, filter, "`pokemon_evolution`.*", suffixes...)
+	if err != nil {
+		return &table.PokemonEvolution{}, err
+	}
+	qb = qb.Where(sq.Eq{"`pokemon_evolution`.`id`": iD})
+
+	// run query
+	pe := table.PokemonEvolution{}
+	err = per.DB.Get(ctx, &pe, qb)
+	if err != nil {
+		return &table.PokemonEvolution{}, err
+	}
+	return &pe, nil
+}
 
 func (per *PokemonEvolutionRepository) PokemonEvolutionByEvolvedSpeciesID(ctx context.Context, evolvedSpeciesID int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error) {
 	return per.PokemonEvolutionByEvolvedSpeciesIDWithSuffix(ctx, evolvedSpeciesID, filter, pagination)
@@ -345,26 +367,4 @@ func (per *PokemonEvolutionRepository) PokemonEvolutionByEvolvedSpeciesIDWithSuf
 
 	return &list, nil
 
-}
-func (per *PokemonEvolutionRepository) PokemonEvolutionByID(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter) (table.PokemonEvolution, error) {
-	return per.PokemonEvolutionByIDWithSuffix(ctx, iD, filter)
-}
-
-func (per *PokemonEvolutionRepository) PokemonEvolutionByIDWithSuffix(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter, suffixes ...sq.Sqlizer) (table.PokemonEvolution, error) {
-	var err error
-
-	// sql query
-	qb, err := per.FindAllPokemonEvolutionBaseQuery(ctx, filter, "`pokemon_evolution`.*", suffixes...)
-	if err != nil {
-		return table.PokemonEvolution{}, err
-	}
-	qb = qb.Where(sq.Eq{"`pokemon_evolution`.`id`": iD})
-
-	// run query
-	pe := table.PokemonEvolution{}
-	err = per.DB.Get(ctx, &pe, qb)
-	if err != nil {
-		return table.PokemonEvolution{}, err
-	}
-	return pe, nil
 }

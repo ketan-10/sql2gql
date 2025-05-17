@@ -7,13 +7,9 @@ type PokemonEvolution {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonEvolutionMatchupByEvolvedSpeciesID(filter: PokemonEvolutionMatchupFilter): PokemonEvolutionMatchup
-
-
-
-
+# ManyToOne
+    pokemonEvolutionMatchupThroughEvolvedSpeciesID(filter: PokemonEvolutionMatchupFilter): PokemonEvolutionMatchup
+# OneToMany
 }
 input PokemonEvolutionFilter {
     iD: FilterOnField

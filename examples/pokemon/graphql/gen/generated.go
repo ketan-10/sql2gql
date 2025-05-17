@@ -43,6 +43,7 @@ type Config struct {
 type ResolverRoot interface {
 	Abilities() AbilitiesResolver
 	BaseStats() BaseStatsResolver
+	Mutation() MutationResolver
 	Pokemon() PokemonResolver
 	PokemonAbilities() PokemonAbilitiesResolver
 	PokemonEvolution() PokemonEvolutionResolver
@@ -57,27 +58,27 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Abilities struct {
-		AbilityName                 func(childComplexity int) int
-		Active                      func(childComplexity int) int
-		CreatedAt                   func(childComplexity int) int
-		ID                          func(childComplexity int) int
-		PokemonAbilitiesByFkAbility func(childComplexity int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) int
-		UpdatedAt                   func(childComplexity int) int
+		AbilityName                      func(childComplexity int) int
+		Active                           func(childComplexity int) int
+		CreatedAt                        func(childComplexity int) int
+		ID                               func(childComplexity int) int
+		PokemonAbilitiesThroughFkAbility func(childComplexity int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) int
+		UpdatedAt                        func(childComplexity int) int
 	}
 
 	BaseStats struct {
-		Active             func(childComplexity int) int
-		BAtk               func(childComplexity int) int
-		BDef               func(childComplexity int) int
-		BHp                func(childComplexity int) int
-		BSpAtk             func(childComplexity int) int
-		BSpDef             func(childComplexity int) int
-		BSpeed             func(childComplexity int) int
-		CreatedAt          func(childComplexity int) int
-		FkPokemon          func(childComplexity int) int
-		ID                 func(childComplexity int) int
-		PokemonByFkPokemon func(childComplexity int, filter *table.PokemonFilter) int
-		UpdatedAt          func(childComplexity int) int
+		Active                  func(childComplexity int) int
+		BAtk                    func(childComplexity int) int
+		BDef                    func(childComplexity int) int
+		BHp                     func(childComplexity int) int
+		BSpAtk                  func(childComplexity int) int
+		BSpDef                  func(childComplexity int) int
+		BSpeed                  func(childComplexity int) int
+		CreatedAt               func(childComplexity int) int
+		FkPokemon               func(childComplexity int) int
+		ID                      func(childComplexity int) int
+		PokemonThroughFkPokemon func(childComplexity int, filter *table.PokemonFilter) int
+		UpdatedAt               func(childComplexity int) int
 	}
 
 	ListAbilities struct {
@@ -120,117 +121,218 @@ type ComplexityRoot struct {
 		TotalCount func(childComplexity int) int
 	}
 
+	Mutation struct {
+		DeleteAbilitiesByID                   func(childComplexity int, id int) int
+		DeleteBaseStatsByID                   func(childComplexity int, id int) int
+		DeletePokemonAbilitiesByID            func(childComplexity int, id int) int
+		DeletePokemonByID                     func(childComplexity int, id int) int
+		DeletePokemonEvolutionByID            func(childComplexity int, id int) int
+		DeletePokemonEvolutionMatchupByID     func(childComplexity int, id int) int
+		DeletePokemonTypesByID                func(childComplexity int, id int) int
+		DeleteTypesByID                       func(childComplexity int, id int) int
+		InsertAbilities                       func(childComplexity int, data table.AbilitiesCreate) int
+		InsertBaseStats                       func(childComplexity int, data table.BaseStatsCreate) int
+		InsertPokemon                         func(childComplexity int, data table.PokemonCreate) int
+		InsertPokemonAbilities                func(childComplexity int, data table.PokemonAbilitiesCreate) int
+		InsertPokemonEvolution                func(childComplexity int, data table.PokemonEvolutionCreate) int
+		InsertPokemonEvolutionMatchup         func(childComplexity int, data table.PokemonEvolutionMatchupCreate) int
+		InsertPokemonTypes                    func(childComplexity int, data table.PokemonTypesCreate) int
+		InsertTypes                           func(childComplexity int, data table.TypesCreate) int
+		UpdateAbilitiesByFields               func(childComplexity int, id int, data table.AbilitiesUpdate) int
+		UpdateBaseStatsByFields               func(childComplexity int, id int, data table.BaseStatsUpdate) int
+		UpdatePokemonAbilitiesByFields        func(childComplexity int, id int, data table.PokemonAbilitiesUpdate) int
+		UpdatePokemonByFields                 func(childComplexity int, id int, data table.PokemonUpdate) int
+		UpdatePokemonEvolutionByFields        func(childComplexity int, id int, data table.PokemonEvolutionUpdate) int
+		UpdatePokemonEvolutionMatchupByFields func(childComplexity int, id int, data table.PokemonEvolutionMatchupUpdate) int
+		UpdatePokemonTypesByFields            func(childComplexity int, id int, data table.PokemonTypesUpdate) int
+		UpdateTypesByFields                   func(childComplexity int, id int, data table.TypesUpdate) int
+	}
+
 	Pokemon struct {
-		Active                             func(childComplexity int) int
-		BaseStatsByFkPokemon               func(childComplexity int, filter *table.BaseStatsFilter, pagination *internal.Pagination) int
-		CreatedAt                          func(childComplexity int) int
-		ID                                 func(childComplexity int) int
-		PokemonAbilitiesByFkPokemon        func(childComplexity int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) int
-		PokemonBaseExperience              func(childComplexity int) int
-		PokemonEvolutionMatchupByPokemonID func(childComplexity int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) int
-		PokemonHeight                      func(childComplexity int) int
-		PokemonName                        func(childComplexity int) int
-		PokemonTypesByPokemonID            func(childComplexity int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) int
-		PokemonWeight                      func(childComplexity int) int
-		UpdatedAt                          func(childComplexity int) int
+		Active                                  func(childComplexity int) int
+		BaseStatsThroughFkPokemon               func(childComplexity int, filter *table.BaseStatsFilter, pagination *internal.Pagination) int
+		CreatedAt                               func(childComplexity int) int
+		ID                                      func(childComplexity int) int
+		PokemonAbilitiesThroughFkPokemon        func(childComplexity int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) int
+		PokemonBaseExperience                   func(childComplexity int) int
+		PokemonEvolutionMatchupThroughPokemonID func(childComplexity int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) int
+		PokemonHeight                           func(childComplexity int) int
+		PokemonName                             func(childComplexity int) int
+		PokemonTypesThroughPokemonID            func(childComplexity int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) int
+		PokemonWeight                           func(childComplexity int) int
+		UpdatedAt                               func(childComplexity int) int
 	}
 
 	PokemonAbilities struct {
-		AbilitiesByFkAbility func(childComplexity int, filter *table.AbilitiesFilter) int
-		Active               func(childComplexity int) int
-		CreatedAt            func(childComplexity int) int
-		FkAbility            func(childComplexity int) int
-		FkPokemon            func(childComplexity int) int
-		ID                   func(childComplexity int) int
-		IsHidden             func(childComplexity int) int
-		PokemonByFkPokemon   func(childComplexity int, filter *table.PokemonFilter) int
-		Slot                 func(childComplexity int) int
-		UpdatedAt            func(childComplexity int) int
+		AbilitiesThroughFkAbility func(childComplexity int, filter *table.AbilitiesFilter) int
+		Active                    func(childComplexity int) int
+		CreatedAt                 func(childComplexity int) int
+		FkAbility                 func(childComplexity int) int
+		FkPokemon                 func(childComplexity int) int
+		ID                        func(childComplexity int) int
+		IsHidden                  func(childComplexity int) int
+		PokemonThroughFkPokemon   func(childComplexity int, filter *table.PokemonFilter) int
+		Slot                      func(childComplexity int) int
+		UpdatedAt                 func(childComplexity int) int
 	}
 
 	PokemonEvolution struct {
-		Active                                    func(childComplexity int) int
-		CreatedAt                                 func(childComplexity int) int
-		EvolMinimumLevel                          func(childComplexity int) int
-		EvolvedSpeciesID                          func(childComplexity int) int
-		ID                                        func(childComplexity int) int
-		PokemonEvolutionMatchupByEvolvedSpeciesID func(childComplexity int, filter *table.PokemonEvolutionMatchupFilter) int
-		UpdatedAt                                 func(childComplexity int) int
+		Active                                         func(childComplexity int) int
+		CreatedAt                                      func(childComplexity int) int
+		EvolMinimumLevel                               func(childComplexity int) int
+		EvolvedSpeciesID                               func(childComplexity int) int
+		ID                                             func(childComplexity int) int
+		PokemonEvolutionMatchupThroughEvolvedSpeciesID func(childComplexity int, filter *table.PokemonEvolutionMatchupFilter) int
+		UpdatedAt                                      func(childComplexity int) int
 	}
 
 	PokemonEvolutionMatchup struct {
-		Active                             func(childComplexity int) int
-		BaseHappiness                      func(childComplexity int) int
-		CaptureRate                        func(childComplexity int) int
-		CreatedAt                          func(childComplexity int) int
-		EvolvesFromSpeciesID               func(childComplexity int) int
-		GenderRate                         func(childComplexity int) int
-		Habitat                            func(childComplexity int) int
-		ID                                 func(childComplexity int) int
-		PokemonByPokemonID                 func(childComplexity int, filter *table.PokemonFilter) int
-		PokemonEvolutionByEvolvedSpeciesID func(childComplexity int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) int
-		PokemonID                          func(childComplexity int) int
-		UpdatedAt                          func(childComplexity int) int
+		Active                                  func(childComplexity int) int
+		BaseHappiness                           func(childComplexity int) int
+		CaptureRate                             func(childComplexity int) int
+		CreatedAt                               func(childComplexity int) int
+		EvolvesFromSpeciesID                    func(childComplexity int) int
+		GenderRate                              func(childComplexity int) int
+		Habitat                                 func(childComplexity int) int
+		ID                                      func(childComplexity int) int
+		PokemonEvolutionThroughEvolvedSpeciesID func(childComplexity int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) int
+		PokemonID                               func(childComplexity int) int
+		PokemonThroughPokemonID                 func(childComplexity int, filter *table.PokemonFilter) int
+		UpdatedAt                               func(childComplexity int) int
 	}
 
 	PokemonTypes struct {
-		Active             func(childComplexity int) int
-		CreatedAt          func(childComplexity int) int
-		ID                 func(childComplexity int) int
-		PokemonByPokemonID func(childComplexity int, filter *table.PokemonFilter) int
-		PokemonID          func(childComplexity int) int
-		Slot               func(childComplexity int) int
-		TypeID             func(childComplexity int) int
-		TypesByTypeID      func(childComplexity int, filter *table.TypesFilter) int
-		UpdatedAt          func(childComplexity int) int
+		Active                  func(childComplexity int) int
+		CreatedAt               func(childComplexity int) int
+		ID                      func(childComplexity int) int
+		PokemonID               func(childComplexity int) int
+		PokemonThroughPokemonID func(childComplexity int, filter *table.PokemonFilter) int
+		Slot                    func(childComplexity int) int
+		TypeID                  func(childComplexity int) int
+		TypesThroughTypeID      func(childComplexity int, filter *table.TypesFilter) int
+		UpdatedAt               func(childComplexity int) int
 	}
 
 	Query struct {
-		FindAllPokemon func(childComplexity int, filter *table.PokemonFilter, pagination *internal.Pagination) int
+		AbilitiesByAbilityName             func(childComplexity int, abilityName string, filter *table.AbilitiesFilter, pagination *internal.Pagination) int
+		AbilitiesByID                      func(childComplexity int, iD int, filter *table.AbilitiesFilter) int
+		BaseStatsByFkPokemon               func(childComplexity int, fkPokemon int, filter *table.BaseStatsFilter, pagination *internal.Pagination) int
+		BaseStatsByID                      func(childComplexity int, iD int, filter *table.BaseStatsFilter) int
+		FindAllAbilities                   func(childComplexity int, filter *table.AbilitiesFilter, pagination *internal.Pagination) int
+		FindAllBaseStats                   func(childComplexity int, filter *table.BaseStatsFilter, pagination *internal.Pagination) int
+		FindAllPokemon                     func(childComplexity int, filter *table.PokemonFilter, pagination *internal.Pagination) int
+		FindAllPokemonAbilities            func(childComplexity int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) int
+		FindAllPokemonEvolution            func(childComplexity int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) int
+		FindAllPokemonEvolutionMatchup     func(childComplexity int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) int
+		FindAllPokemonTypes                func(childComplexity int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) int
+		FindAllTypes                       func(childComplexity int, filter *table.TypesFilter, pagination *internal.Pagination) int
+		PokemonAbilitiesByFkAbility        func(childComplexity int, fkAbility int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) int
+		PokemonAbilitiesByFkPokemon        func(childComplexity int, fkPokemon int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) int
+		PokemonAbilitiesByID               func(childComplexity int, iD int, filter *table.PokemonAbilitiesFilter) int
+		PokemonByID                        func(childComplexity int, iD int, filter *table.PokemonFilter) int
+		PokemonByPokemonName               func(childComplexity int, pokemonName string, filter *table.PokemonFilter, pagination *internal.Pagination) int
+		PokemonEvolutionByEvolvedSpeciesID func(childComplexity int, evolvedSpeciesID int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) int
+		PokemonEvolutionByID               func(childComplexity int, iD int, filter *table.PokemonEvolutionFilter) int
+		PokemonEvolutionMatchupByID        func(childComplexity int, iD int, filter *table.PokemonEvolutionMatchupFilter) int
+		PokemonEvolutionMatchupByPokemonID func(childComplexity int, pokemonID int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) int
+		PokemonTypesByID                   func(childComplexity int, iD int, filter *table.PokemonTypesFilter) int
+		PokemonTypesByPokemonID            func(childComplexity int, pokemonID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) int
+		PokemonTypesByTypeID               func(childComplexity int, typeID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) int
+		TypesByID                          func(childComplexity int, iD int, filter *table.TypesFilter) int
 	}
 
 	Types struct {
-		Active               func(childComplexity int) int
-		CreatedAt            func(childComplexity int) int
-		ID                   func(childComplexity int) int
-		PokemonTypesByTypeID func(childComplexity int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) int
-		TypeName             func(childComplexity int) int
-		UpdatedAt            func(childComplexity int) int
+		Active                    func(childComplexity int) int
+		CreatedAt                 func(childComplexity int) int
+		ID                        func(childComplexity int) int
+		PokemonTypesThroughTypeID func(childComplexity int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) int
+		TypeName                  func(childComplexity int) int
+		UpdatedAt                 func(childComplexity int) int
 	}
 }
 
 type AbilitiesResolver interface {
-	PokemonAbilitiesByFkAbility(ctx context.Context, obj *table.Abilities, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
+	PokemonAbilitiesThroughFkAbility(ctx context.Context, obj *table.Abilities, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
 }
 type BaseStatsResolver interface {
-	PokemonByFkPokemon(ctx context.Context, obj *table.BaseStats, filter *table.PokemonFilter) (*table.Pokemon, error)
+	PokemonThroughFkPokemon(ctx context.Context, obj *table.BaseStats, filter *table.PokemonFilter) (*table.Pokemon, error)
+}
+type MutationResolver interface {
+	InsertAbilities(ctx context.Context, data table.AbilitiesCreate) (*table.Abilities, error)
+	UpdateAbilitiesByFields(ctx context.Context, id int, data table.AbilitiesUpdate) (*table.Abilities, error)
+	DeleteAbilitiesByID(ctx context.Context, id int) (bool, error)
+	InsertBaseStats(ctx context.Context, data table.BaseStatsCreate) (*table.BaseStats, error)
+	UpdateBaseStatsByFields(ctx context.Context, id int, data table.BaseStatsUpdate) (*table.BaseStats, error)
+	DeleteBaseStatsByID(ctx context.Context, id int) (bool, error)
+	InsertPokemon(ctx context.Context, data table.PokemonCreate) (*table.Pokemon, error)
+	UpdatePokemonByFields(ctx context.Context, id int, data table.PokemonUpdate) (*table.Pokemon, error)
+	DeletePokemonByID(ctx context.Context, id int) (bool, error)
+	InsertPokemonAbilities(ctx context.Context, data table.PokemonAbilitiesCreate) (*table.PokemonAbilities, error)
+	UpdatePokemonAbilitiesByFields(ctx context.Context, id int, data table.PokemonAbilitiesUpdate) (*table.PokemonAbilities, error)
+	DeletePokemonAbilitiesByID(ctx context.Context, id int) (bool, error)
+	InsertPokemonEvolution(ctx context.Context, data table.PokemonEvolutionCreate) (*table.PokemonEvolution, error)
+	UpdatePokemonEvolutionByFields(ctx context.Context, id int, data table.PokemonEvolutionUpdate) (*table.PokemonEvolution, error)
+	DeletePokemonEvolutionByID(ctx context.Context, id int) (bool, error)
+	InsertPokemonEvolutionMatchup(ctx context.Context, data table.PokemonEvolutionMatchupCreate) (*table.PokemonEvolutionMatchup, error)
+	UpdatePokemonEvolutionMatchupByFields(ctx context.Context, id int, data table.PokemonEvolutionMatchupUpdate) (*table.PokemonEvolutionMatchup, error)
+	DeletePokemonEvolutionMatchupByID(ctx context.Context, id int) (bool, error)
+	InsertPokemonTypes(ctx context.Context, data table.PokemonTypesCreate) (*table.PokemonTypes, error)
+	UpdatePokemonTypesByFields(ctx context.Context, id int, data table.PokemonTypesUpdate) (*table.PokemonTypes, error)
+	DeletePokemonTypesByID(ctx context.Context, id int) (bool, error)
+	InsertTypes(ctx context.Context, data table.TypesCreate) (*table.Types, error)
+	UpdateTypesByFields(ctx context.Context, id int, data table.TypesUpdate) (*table.Types, error)
+	DeleteTypesByID(ctx context.Context, id int) (bool, error)
 }
 type PokemonResolver interface {
-	BaseStatsByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
-	PokemonAbilitiesByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
-	PokemonEvolutionMatchupByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
-	PokemonTypesByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
+	BaseStatsThroughFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
+	PokemonAbilitiesThroughFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
+	PokemonEvolutionMatchupThroughPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
+	PokemonTypesThroughPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
 }
 type PokemonAbilitiesResolver interface {
-	PokemonByFkPokemon(ctx context.Context, obj *table.PokemonAbilities, filter *table.PokemonFilter) (*table.Pokemon, error)
-	AbilitiesByFkAbility(ctx context.Context, obj *table.PokemonAbilities, filter *table.AbilitiesFilter) (*table.Abilities, error)
+	PokemonThroughFkPokemon(ctx context.Context, obj *table.PokemonAbilities, filter *table.PokemonFilter) (*table.Pokemon, error)
+	AbilitiesThroughFkAbility(ctx context.Context, obj *table.PokemonAbilities, filter *table.AbilitiesFilter) (*table.Abilities, error)
 }
 type PokemonEvolutionResolver interface {
-	PokemonEvolutionMatchupByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolution, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error)
+	PokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolution, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error)
 }
 type PokemonEvolutionMatchupResolver interface {
-	PokemonByPokemonID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonFilter) (*table.Pokemon, error)
-	PokemonEvolutionByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
+	PokemonThroughPokemonID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonFilter) (*table.Pokemon, error)
+	PokemonEvolutionThroughEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
 }
 type PokemonTypesResolver interface {
-	PokemonByPokemonID(ctx context.Context, obj *table.PokemonTypes, filter *table.PokemonFilter) (*table.Pokemon, error)
-	TypesByTypeID(ctx context.Context, obj *table.PokemonTypes, filter *table.TypesFilter) (*table.Types, error)
+	PokemonThroughPokemonID(ctx context.Context, obj *table.PokemonTypes, filter *table.PokemonFilter) (*table.Pokemon, error)
+	TypesThroughTypeID(ctx context.Context, obj *table.PokemonTypes, filter *table.TypesFilter) (*table.Types, error)
 }
 type QueryResolver interface {
+	FindAllAbilities(ctx context.Context, filter *table.AbilitiesFilter, pagination *internal.Pagination) (*table.ListAbilities, error)
+	AbilitiesByAbilityName(ctx context.Context, abilityName string, filter *table.AbilitiesFilter, pagination *internal.Pagination) (*table.ListAbilities, error)
+	AbilitiesByID(ctx context.Context, iD int, filter *table.AbilitiesFilter) (*table.Abilities, error)
+	FindAllBaseStats(ctx context.Context, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
+	BaseStatsByFkPokemon(ctx context.Context, fkPokemon int, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
+	BaseStatsByID(ctx context.Context, iD int, filter *table.BaseStatsFilter) (*table.BaseStats, error)
 	FindAllPokemon(ctx context.Context, filter *table.PokemonFilter, pagination *internal.Pagination) (*table.ListPokemon, error)
+	PokemonByID(ctx context.Context, iD int, filter *table.PokemonFilter) (*table.Pokemon, error)
+	PokemonByPokemonName(ctx context.Context, pokemonName string, filter *table.PokemonFilter, pagination *internal.Pagination) (*table.ListPokemon, error)
+	FindAllPokemonAbilities(ctx context.Context, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
+	PokemonAbilitiesByFkPokemon(ctx context.Context, fkPokemon int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
+	PokemonAbilitiesByID(ctx context.Context, iD int, filter *table.PokemonAbilitiesFilter) (*table.PokemonAbilities, error)
+	PokemonAbilitiesByFkAbility(ctx context.Context, fkAbility int, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
+	FindAllPokemonEvolution(ctx context.Context, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
+	PokemonEvolutionByEvolvedSpeciesID(ctx context.Context, evolvedSpeciesID int, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error)
+	PokemonEvolutionByID(ctx context.Context, iD int, filter *table.PokemonEvolutionFilter) (*table.PokemonEvolution, error)
+	FindAllPokemonEvolutionMatchup(ctx context.Context, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
+	PokemonEvolutionMatchupByPokemonID(ctx context.Context, pokemonID int, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
+	PokemonEvolutionMatchupByID(ctx context.Context, iD int, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error)
+	FindAllPokemonTypes(ctx context.Context, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
+	PokemonTypesByPokemonID(ctx context.Context, pokemonID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
+	PokemonTypesByID(ctx context.Context, iD int, filter *table.PokemonTypesFilter) (*table.PokemonTypes, error)
+	PokemonTypesByTypeID(ctx context.Context, typeID int, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
+	FindAllTypes(ctx context.Context, filter *table.TypesFilter, pagination *internal.Pagination) (*table.ListTypes, error)
+	TypesByID(ctx context.Context, iD int, filter *table.TypesFilter) (*table.Types, error)
 }
 type TypesResolver interface {
-	PokemonTypesByTypeID(ctx context.Context, obj *table.Types, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
+	PokemonTypesThroughTypeID(ctx context.Context, obj *table.Types, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
 }
 
 type executableSchema struct {
@@ -280,17 +382,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Abilities.ID(childComplexity), true
 
-	case "Abilities.pokemonAbilitiesByFkAbility":
-		if e.complexity.Abilities.PokemonAbilitiesByFkAbility == nil {
+	case "Abilities.pokemonAbilitiesThroughFkAbility":
+		if e.complexity.Abilities.PokemonAbilitiesThroughFkAbility == nil {
 			break
 		}
 
-		args, err := ec.field_Abilities_pokemonAbilitiesByFkAbility_args(ctx, rawArgs)
+		args, err := ec.field_Abilities_pokemonAbilitiesThroughFkAbility_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Abilities.PokemonAbilitiesByFkAbility(childComplexity, args["filter"].(*table.PokemonAbilitiesFilter), args["pagination"].(*internal.Pagination)), true
+		return e.complexity.Abilities.PokemonAbilitiesThroughFkAbility(childComplexity, args["filter"].(*table.PokemonAbilitiesFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "Abilities.updatedAt":
 		if e.complexity.Abilities.UpdatedAt == nil {
@@ -369,17 +471,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.BaseStats.ID(childComplexity), true
 
-	case "BaseStats.pokemonByFkPokemon":
-		if e.complexity.BaseStats.PokemonByFkPokemon == nil {
+	case "BaseStats.pokemonThroughFkPokemon":
+		if e.complexity.BaseStats.PokemonThroughFkPokemon == nil {
 			break
 		}
 
-		args, err := ec.field_BaseStats_pokemonByFkPokemon_args(ctx, rawArgs)
+		args, err := ec.field_BaseStats_pokemonThroughFkPokemon_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.BaseStats.PokemonByFkPokemon(childComplexity, args["filter"].(*table.PokemonFilter)), true
+		return e.complexity.BaseStats.PokemonThroughFkPokemon(childComplexity, args["filter"].(*table.PokemonFilter)), true
 
 	case "BaseStats.updatedAt":
 		if e.complexity.BaseStats.UpdatedAt == nil {
@@ -500,6 +602,294 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ListTypes.TotalCount(childComplexity), true
 
+	case "Mutation.deleteAbilitiesByID":
+		if e.complexity.Mutation.DeleteAbilitiesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteAbilitiesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteAbilitiesByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deleteBaseStatsByID":
+		if e.complexity.Mutation.DeleteBaseStatsByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteBaseStatsByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteBaseStatsByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deletePokemonAbilitiesByID":
+		if e.complexity.Mutation.DeletePokemonAbilitiesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePokemonAbilitiesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePokemonAbilitiesByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deletePokemonByID":
+		if e.complexity.Mutation.DeletePokemonByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePokemonByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePokemonByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deletePokemonEvolutionByID":
+		if e.complexity.Mutation.DeletePokemonEvolutionByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePokemonEvolutionByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePokemonEvolutionByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deletePokemonEvolutionMatchupByID":
+		if e.complexity.Mutation.DeletePokemonEvolutionMatchupByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePokemonEvolutionMatchupByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePokemonEvolutionMatchupByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deletePokemonTypesByID":
+		if e.complexity.Mutation.DeletePokemonTypesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePokemonTypesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePokemonTypesByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deleteTypesByID":
+		if e.complexity.Mutation.DeleteTypesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTypesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTypesByID(childComplexity, args["id"].(int)), true
+
+	case "Mutation.insertAbilities":
+		if e.complexity.Mutation.InsertAbilities == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertAbilities_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertAbilities(childComplexity, args["data"].(table.AbilitiesCreate)), true
+
+	case "Mutation.insertBaseStats":
+		if e.complexity.Mutation.InsertBaseStats == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertBaseStats_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertBaseStats(childComplexity, args["data"].(table.BaseStatsCreate)), true
+
+	case "Mutation.insertPokemon":
+		if e.complexity.Mutation.InsertPokemon == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertPokemon_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertPokemon(childComplexity, args["data"].(table.PokemonCreate)), true
+
+	case "Mutation.insertPokemonAbilities":
+		if e.complexity.Mutation.InsertPokemonAbilities == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertPokemonAbilities_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertPokemonAbilities(childComplexity, args["data"].(table.PokemonAbilitiesCreate)), true
+
+	case "Mutation.insertPokemonEvolution":
+		if e.complexity.Mutation.InsertPokemonEvolution == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertPokemonEvolution_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertPokemonEvolution(childComplexity, args["data"].(table.PokemonEvolutionCreate)), true
+
+	case "Mutation.insertPokemonEvolutionMatchup":
+		if e.complexity.Mutation.InsertPokemonEvolutionMatchup == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertPokemonEvolutionMatchup_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertPokemonEvolutionMatchup(childComplexity, args["data"].(table.PokemonEvolutionMatchupCreate)), true
+
+	case "Mutation.insertPokemonTypes":
+		if e.complexity.Mutation.InsertPokemonTypes == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertPokemonTypes_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertPokemonTypes(childComplexity, args["data"].(table.PokemonTypesCreate)), true
+
+	case "Mutation.insertTypes":
+		if e.complexity.Mutation.InsertTypes == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertTypes_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertTypes(childComplexity, args["data"].(table.TypesCreate)), true
+
+	case "Mutation.updateAbilitiesByFields":
+		if e.complexity.Mutation.UpdateAbilitiesByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAbilitiesByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAbilitiesByFields(childComplexity, args["id"].(int), args["data"].(table.AbilitiesUpdate)), true
+
+	case "Mutation.updateBaseStatsByFields":
+		if e.complexity.Mutation.UpdateBaseStatsByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateBaseStatsByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateBaseStatsByFields(childComplexity, args["id"].(int), args["data"].(table.BaseStatsUpdate)), true
+
+	case "Mutation.updatePokemonAbilitiesByFields":
+		if e.complexity.Mutation.UpdatePokemonAbilitiesByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePokemonAbilitiesByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePokemonAbilitiesByFields(childComplexity, args["id"].(int), args["data"].(table.PokemonAbilitiesUpdate)), true
+
+	case "Mutation.updatePokemonByFields":
+		if e.complexity.Mutation.UpdatePokemonByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePokemonByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePokemonByFields(childComplexity, args["id"].(int), args["data"].(table.PokemonUpdate)), true
+
+	case "Mutation.updatePokemonEvolutionByFields":
+		if e.complexity.Mutation.UpdatePokemonEvolutionByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePokemonEvolutionByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePokemonEvolutionByFields(childComplexity, args["id"].(int), args["data"].(table.PokemonEvolutionUpdate)), true
+
+	case "Mutation.updatePokemonEvolutionMatchupByFields":
+		if e.complexity.Mutation.UpdatePokemonEvolutionMatchupByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePokemonEvolutionMatchupByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePokemonEvolutionMatchupByFields(childComplexity, args["id"].(int), args["data"].(table.PokemonEvolutionMatchupUpdate)), true
+
+	case "Mutation.updatePokemonTypesByFields":
+		if e.complexity.Mutation.UpdatePokemonTypesByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePokemonTypesByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePokemonTypesByFields(childComplexity, args["id"].(int), args["data"].(table.PokemonTypesUpdate)), true
+
+	case "Mutation.updateTypesByFields":
+		if e.complexity.Mutation.UpdateTypesByFields == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTypesByFields_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateTypesByFields(childComplexity, args["id"].(int), args["data"].(table.TypesUpdate)), true
+
 	case "Pokemon.active":
 		if e.complexity.Pokemon.Active == nil {
 			break
@@ -507,17 +897,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Pokemon.Active(childComplexity), true
 
-	case "Pokemon.baseStatsByFkPokemon":
-		if e.complexity.Pokemon.BaseStatsByFkPokemon == nil {
+	case "Pokemon.baseStatsThroughFkPokemon":
+		if e.complexity.Pokemon.BaseStatsThroughFkPokemon == nil {
 			break
 		}
 
-		args, err := ec.field_Pokemon_baseStatsByFkPokemon_args(ctx, rawArgs)
+		args, err := ec.field_Pokemon_baseStatsThroughFkPokemon_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Pokemon.BaseStatsByFkPokemon(childComplexity, args["filter"].(*table.BaseStatsFilter), args["pagination"].(*internal.Pagination)), true
+		return e.complexity.Pokemon.BaseStatsThroughFkPokemon(childComplexity, args["filter"].(*table.BaseStatsFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "Pokemon.createdAt":
 		if e.complexity.Pokemon.CreatedAt == nil {
@@ -533,17 +923,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Pokemon.ID(childComplexity), true
 
-	case "Pokemon.pokemonAbilitiesByFkPokemon":
-		if e.complexity.Pokemon.PokemonAbilitiesByFkPokemon == nil {
+	case "Pokemon.pokemonAbilitiesThroughFkPokemon":
+		if e.complexity.Pokemon.PokemonAbilitiesThroughFkPokemon == nil {
 			break
 		}
 
-		args, err := ec.field_Pokemon_pokemonAbilitiesByFkPokemon_args(ctx, rawArgs)
+		args, err := ec.field_Pokemon_pokemonAbilitiesThroughFkPokemon_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Pokemon.PokemonAbilitiesByFkPokemon(childComplexity, args["filter"].(*table.PokemonAbilitiesFilter), args["pagination"].(*internal.Pagination)), true
+		return e.complexity.Pokemon.PokemonAbilitiesThroughFkPokemon(childComplexity, args["filter"].(*table.PokemonAbilitiesFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "Pokemon.pokemonBaseExperience":
 		if e.complexity.Pokemon.PokemonBaseExperience == nil {
@@ -552,17 +942,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Pokemon.PokemonBaseExperience(childComplexity), true
 
-	case "Pokemon.pokemonEvolutionMatchupByPokemonID":
-		if e.complexity.Pokemon.PokemonEvolutionMatchupByPokemonID == nil {
+	case "Pokemon.pokemonEvolutionMatchupThroughPokemonID":
+		if e.complexity.Pokemon.PokemonEvolutionMatchupThroughPokemonID == nil {
 			break
 		}
 
-		args, err := ec.field_Pokemon_pokemonEvolutionMatchupByPokemonID_args(ctx, rawArgs)
+		args, err := ec.field_Pokemon_pokemonEvolutionMatchupThroughPokemonID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Pokemon.PokemonEvolutionMatchupByPokemonID(childComplexity, args["filter"].(*table.PokemonEvolutionMatchupFilter), args["pagination"].(*internal.Pagination)), true
+		return e.complexity.Pokemon.PokemonEvolutionMatchupThroughPokemonID(childComplexity, args["filter"].(*table.PokemonEvolutionMatchupFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "Pokemon.pokemonHeight":
 		if e.complexity.Pokemon.PokemonHeight == nil {
@@ -578,17 +968,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Pokemon.PokemonName(childComplexity), true
 
-	case "Pokemon.pokemonTypesByPokemonID":
-		if e.complexity.Pokemon.PokemonTypesByPokemonID == nil {
+	case "Pokemon.pokemonTypesThroughPokemonID":
+		if e.complexity.Pokemon.PokemonTypesThroughPokemonID == nil {
 			break
 		}
 
-		args, err := ec.field_Pokemon_pokemonTypesByPokemonID_args(ctx, rawArgs)
+		args, err := ec.field_Pokemon_pokemonTypesThroughPokemonID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Pokemon.PokemonTypesByPokemonID(childComplexity, args["filter"].(*table.PokemonTypesFilter), args["pagination"].(*internal.Pagination)), true
+		return e.complexity.Pokemon.PokemonTypesThroughPokemonID(childComplexity, args["filter"].(*table.PokemonTypesFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "Pokemon.pokemonWeight":
 		if e.complexity.Pokemon.PokemonWeight == nil {
@@ -604,17 +994,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Pokemon.UpdatedAt(childComplexity), true
 
-	case "PokemonAbilities.abilitiesByFkAbility":
-		if e.complexity.PokemonAbilities.AbilitiesByFkAbility == nil {
+	case "PokemonAbilities.abilitiesThroughFkAbility":
+		if e.complexity.PokemonAbilities.AbilitiesThroughFkAbility == nil {
 			break
 		}
 
-		args, err := ec.field_PokemonAbilities_abilitiesByFkAbility_args(ctx, rawArgs)
+		args, err := ec.field_PokemonAbilities_abilitiesThroughFkAbility_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.PokemonAbilities.AbilitiesByFkAbility(childComplexity, args["filter"].(*table.AbilitiesFilter)), true
+		return e.complexity.PokemonAbilities.AbilitiesThroughFkAbility(childComplexity, args["filter"].(*table.AbilitiesFilter)), true
 
 	case "PokemonAbilities.active":
 		if e.complexity.PokemonAbilities.Active == nil {
@@ -658,17 +1048,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PokemonAbilities.IsHidden(childComplexity), true
 
-	case "PokemonAbilities.pokemonByFkPokemon":
-		if e.complexity.PokemonAbilities.PokemonByFkPokemon == nil {
+	case "PokemonAbilities.pokemonThroughFkPokemon":
+		if e.complexity.PokemonAbilities.PokemonThroughFkPokemon == nil {
 			break
 		}
 
-		args, err := ec.field_PokemonAbilities_pokemonByFkPokemon_args(ctx, rawArgs)
+		args, err := ec.field_PokemonAbilities_pokemonThroughFkPokemon_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.PokemonAbilities.PokemonByFkPokemon(childComplexity, args["filter"].(*table.PokemonFilter)), true
+		return e.complexity.PokemonAbilities.PokemonThroughFkPokemon(childComplexity, args["filter"].(*table.PokemonFilter)), true
 
 	case "PokemonAbilities.slot":
 		if e.complexity.PokemonAbilities.Slot == nil {
@@ -719,17 +1109,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PokemonEvolution.ID(childComplexity), true
 
-	case "PokemonEvolution.pokemonEvolutionMatchupByEvolvedSpeciesID":
-		if e.complexity.PokemonEvolution.PokemonEvolutionMatchupByEvolvedSpeciesID == nil {
+	case "PokemonEvolution.pokemonEvolutionMatchupThroughEvolvedSpeciesID":
+		if e.complexity.PokemonEvolution.PokemonEvolutionMatchupThroughEvolvedSpeciesID == nil {
 			break
 		}
 
-		args, err := ec.field_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID_args(ctx, rawArgs)
+		args, err := ec.field_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.PokemonEvolution.PokemonEvolutionMatchupByEvolvedSpeciesID(childComplexity, args["filter"].(*table.PokemonEvolutionMatchupFilter)), true
+		return e.complexity.PokemonEvolution.PokemonEvolutionMatchupThroughEvolvedSpeciesID(childComplexity, args["filter"].(*table.PokemonEvolutionMatchupFilter)), true
 
 	case "PokemonEvolution.updatedAt":
 		if e.complexity.PokemonEvolution.UpdatedAt == nil {
@@ -794,29 +1184,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PokemonEvolutionMatchup.ID(childComplexity), true
 
-	case "PokemonEvolutionMatchup.pokemonByPokemonID":
-		if e.complexity.PokemonEvolutionMatchup.PokemonByPokemonID == nil {
+	case "PokemonEvolutionMatchup.pokemonEvolutionThroughEvolvedSpeciesID":
+		if e.complexity.PokemonEvolutionMatchup.PokemonEvolutionThroughEvolvedSpeciesID == nil {
 			break
 		}
 
-		args, err := ec.field_PokemonEvolutionMatchup_pokemonByPokemonID_args(ctx, rawArgs)
+		args, err := ec.field_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.PokemonEvolutionMatchup.PokemonByPokemonID(childComplexity, args["filter"].(*table.PokemonFilter)), true
-
-	case "PokemonEvolutionMatchup.pokemonEvolutionByEvolvedSpeciesID":
-		if e.complexity.PokemonEvolutionMatchup.PokemonEvolutionByEvolvedSpeciesID == nil {
-			break
-		}
-
-		args, err := ec.field_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.PokemonEvolutionMatchup.PokemonEvolutionByEvolvedSpeciesID(childComplexity, args["filter"].(*table.PokemonEvolutionFilter), args["pagination"].(*internal.Pagination)), true
+		return e.complexity.PokemonEvolutionMatchup.PokemonEvolutionThroughEvolvedSpeciesID(childComplexity, args["filter"].(*table.PokemonEvolutionFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "PokemonEvolutionMatchup.pokemonID":
 		if e.complexity.PokemonEvolutionMatchup.PokemonID == nil {
@@ -824,6 +1202,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.PokemonEvolutionMatchup.PokemonID(childComplexity), true
+
+	case "PokemonEvolutionMatchup.pokemonThroughPokemonID":
+		if e.complexity.PokemonEvolutionMatchup.PokemonThroughPokemonID == nil {
+			break
+		}
+
+		args, err := ec.field_PokemonEvolutionMatchup_pokemonThroughPokemonID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.PokemonEvolutionMatchup.PokemonThroughPokemonID(childComplexity, args["filter"].(*table.PokemonFilter)), true
 
 	case "PokemonEvolutionMatchup.updatedAt":
 		if e.complexity.PokemonEvolutionMatchup.UpdatedAt == nil {
@@ -853,24 +1243,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PokemonTypes.ID(childComplexity), true
 
-	case "PokemonTypes.pokemonByPokemonID":
-		if e.complexity.PokemonTypes.PokemonByPokemonID == nil {
-			break
-		}
-
-		args, err := ec.field_PokemonTypes_pokemonByPokemonID_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.PokemonTypes.PokemonByPokemonID(childComplexity, args["filter"].(*table.PokemonFilter)), true
-
 	case "PokemonTypes.pokemonID":
 		if e.complexity.PokemonTypes.PokemonID == nil {
 			break
 		}
 
 		return e.complexity.PokemonTypes.PokemonID(childComplexity), true
+
+	case "PokemonTypes.pokemonThroughPokemonID":
+		if e.complexity.PokemonTypes.PokemonThroughPokemonID == nil {
+			break
+		}
+
+		args, err := ec.field_PokemonTypes_pokemonThroughPokemonID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.PokemonTypes.PokemonThroughPokemonID(childComplexity, args["filter"].(*table.PokemonFilter)), true
 
 	case "PokemonTypes.slot":
 		if e.complexity.PokemonTypes.Slot == nil {
@@ -886,17 +1276,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PokemonTypes.TypeID(childComplexity), true
 
-	case "PokemonTypes.typesByTypeID":
-		if e.complexity.PokemonTypes.TypesByTypeID == nil {
+	case "PokemonTypes.typesThroughTypeID":
+		if e.complexity.PokemonTypes.TypesThroughTypeID == nil {
 			break
 		}
 
-		args, err := ec.field_PokemonTypes_typesByTypeID_args(ctx, rawArgs)
+		args, err := ec.field_PokemonTypes_typesThroughTypeID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.PokemonTypes.TypesByTypeID(childComplexity, args["filter"].(*table.TypesFilter)), true
+		return e.complexity.PokemonTypes.TypesThroughTypeID(childComplexity, args["filter"].(*table.TypesFilter)), true
 
 	case "PokemonTypes.updatedAt":
 		if e.complexity.PokemonTypes.UpdatedAt == nil {
@@ -904,6 +1294,78 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.PokemonTypes.UpdatedAt(childComplexity), true
+
+	case "Query.abilitiesByAbilityName":
+		if e.complexity.Query.AbilitiesByAbilityName == nil {
+			break
+		}
+
+		args, err := ec.field_Query_abilitiesByAbilityName_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AbilitiesByAbilityName(childComplexity, args["abilityName"].(string), args["filter"].(*table.AbilitiesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.abilitiesByID":
+		if e.complexity.Query.AbilitiesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_abilitiesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AbilitiesByID(childComplexity, args["iD"].(int), args["filter"].(*table.AbilitiesFilter)), true
+
+	case "Query.baseStatsByFkPokemon":
+		if e.complexity.Query.BaseStatsByFkPokemon == nil {
+			break
+		}
+
+		args, err := ec.field_Query_baseStatsByFkPokemon_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.BaseStatsByFkPokemon(childComplexity, args["fkPokemon"].(int), args["filter"].(*table.BaseStatsFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.baseStatsByID":
+		if e.complexity.Query.BaseStatsByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_baseStatsByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.BaseStatsByID(childComplexity, args["iD"].(int), args["filter"].(*table.BaseStatsFilter)), true
+
+	case "Query.findAllAbilities":
+		if e.complexity.Query.FindAllAbilities == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findAllAbilities_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindAllAbilities(childComplexity, args["filter"].(*table.AbilitiesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.findAllBaseStats":
+		if e.complexity.Query.FindAllBaseStats == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findAllBaseStats_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindAllBaseStats(childComplexity, args["filter"].(*table.BaseStatsFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "Query.findAllPokemon":
 		if e.complexity.Query.FindAllPokemon == nil {
@@ -916,6 +1378,222 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.FindAllPokemon(childComplexity, args["filter"].(*table.PokemonFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.findAllPokemonAbilities":
+		if e.complexity.Query.FindAllPokemonAbilities == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findAllPokemonAbilities_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindAllPokemonAbilities(childComplexity, args["filter"].(*table.PokemonAbilitiesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.findAllPokemonEvolution":
+		if e.complexity.Query.FindAllPokemonEvolution == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findAllPokemonEvolution_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindAllPokemonEvolution(childComplexity, args["filter"].(*table.PokemonEvolutionFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.findAllPokemonEvolutionMatchup":
+		if e.complexity.Query.FindAllPokemonEvolutionMatchup == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findAllPokemonEvolutionMatchup_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindAllPokemonEvolutionMatchup(childComplexity, args["filter"].(*table.PokemonEvolutionMatchupFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.findAllPokemonTypes":
+		if e.complexity.Query.FindAllPokemonTypes == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findAllPokemonTypes_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindAllPokemonTypes(childComplexity, args["filter"].(*table.PokemonTypesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.findAllTypes":
+		if e.complexity.Query.FindAllTypes == nil {
+			break
+		}
+
+		args, err := ec.field_Query_findAllTypes_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindAllTypes(childComplexity, args["filter"].(*table.TypesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.pokemonAbilitiesByFkAbility":
+		if e.complexity.Query.PokemonAbilitiesByFkAbility == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonAbilitiesByFkAbility_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonAbilitiesByFkAbility(childComplexity, args["fkAbility"].(int), args["filter"].(*table.PokemonAbilitiesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.pokemonAbilitiesByFkPokemon":
+		if e.complexity.Query.PokemonAbilitiesByFkPokemon == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonAbilitiesByFkPokemon_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonAbilitiesByFkPokemon(childComplexity, args["fkPokemon"].(int), args["filter"].(*table.PokemonAbilitiesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.pokemonAbilitiesByID":
+		if e.complexity.Query.PokemonAbilitiesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonAbilitiesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonAbilitiesByID(childComplexity, args["iD"].(int), args["filter"].(*table.PokemonAbilitiesFilter)), true
+
+	case "Query.pokemonByID":
+		if e.complexity.Query.PokemonByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonByID(childComplexity, args["iD"].(int), args["filter"].(*table.PokemonFilter)), true
+
+	case "Query.pokemonByPokemonName":
+		if e.complexity.Query.PokemonByPokemonName == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonByPokemonName_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonByPokemonName(childComplexity, args["pokemonName"].(string), args["filter"].(*table.PokemonFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.pokemonEvolutionByEvolvedSpeciesID":
+		if e.complexity.Query.PokemonEvolutionByEvolvedSpeciesID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonEvolutionByEvolvedSpeciesID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonEvolutionByEvolvedSpeciesID(childComplexity, args["evolvedSpeciesID"].(int), args["filter"].(*table.PokemonEvolutionFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.pokemonEvolutionByID":
+		if e.complexity.Query.PokemonEvolutionByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonEvolutionByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonEvolutionByID(childComplexity, args["iD"].(int), args["filter"].(*table.PokemonEvolutionFilter)), true
+
+	case "Query.pokemonEvolutionMatchupByID":
+		if e.complexity.Query.PokemonEvolutionMatchupByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonEvolutionMatchupByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonEvolutionMatchupByID(childComplexity, args["iD"].(int), args["filter"].(*table.PokemonEvolutionMatchupFilter)), true
+
+	case "Query.pokemonEvolutionMatchupByPokemonID":
+		if e.complexity.Query.PokemonEvolutionMatchupByPokemonID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonEvolutionMatchupByPokemonID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonEvolutionMatchupByPokemonID(childComplexity, args["pokemonID"].(int), args["filter"].(*table.PokemonEvolutionMatchupFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.pokemonTypesByID":
+		if e.complexity.Query.PokemonTypesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonTypesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonTypesByID(childComplexity, args["iD"].(int), args["filter"].(*table.PokemonTypesFilter)), true
+
+	case "Query.pokemonTypesByPokemonID":
+		if e.complexity.Query.PokemonTypesByPokemonID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonTypesByPokemonID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonTypesByPokemonID(childComplexity, args["pokemonID"].(int), args["filter"].(*table.PokemonTypesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.pokemonTypesByTypeID":
+		if e.complexity.Query.PokemonTypesByTypeID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pokemonTypesByTypeID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PokemonTypesByTypeID(childComplexity, args["typeID"].(int), args["filter"].(*table.PokemonTypesFilter), args["pagination"].(*internal.Pagination)), true
+
+	case "Query.typesByID":
+		if e.complexity.Query.TypesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_typesByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TypesByID(childComplexity, args["iD"].(int), args["filter"].(*table.TypesFilter)), true
 
 	case "Types.active":
 		if e.complexity.Types.Active == nil {
@@ -938,17 +1616,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Types.ID(childComplexity), true
 
-	case "Types.pokemonTypesByTypeID":
-		if e.complexity.Types.PokemonTypesByTypeID == nil {
+	case "Types.pokemonTypesThroughTypeID":
+		if e.complexity.Types.PokemonTypesThroughTypeID == nil {
 			break
 		}
 
-		args, err := ec.field_Types_pokemonTypesByTypeID_args(ctx, rawArgs)
+		args, err := ec.field_Types_pokemonTypesThroughTypeID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Types.PokemonTypesByTypeID(childComplexity, args["filter"].(*table.PokemonTypesFilter), args["pagination"].(*internal.Pagination)), true
+		return e.complexity.Types.PokemonTypesThroughTypeID(childComplexity, args["filter"].(*table.PokemonTypesFilter), args["pagination"].(*internal.Pagination)), true
 
 	case "Types.typeName":
 		if e.complexity.Types.TypeName == nil {
@@ -1031,6 +1709,21 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 
 			return &response
 		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -1079,11 +1772,107 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../schema/query.graphql", Input: `type Query {
-    
+	{Name: "../schema/query_mutation.graphql", Input: `# Code generated by sql2gql. DO NOT EDIT.
+
+
+type Query {
+
+    # table --> Abilities
+    findAllAbilities(filter: AbilitiesFilter, pagination: Pagination): ListAbilities!
+
+    # Indexes
+    abilitiesByAbilityName( abilityName: String!,filter: AbilitiesFilter, pagination: Pagination): ListAbilities
+    abilitiesByID( iD: Int!,filter: AbilitiesFilter): Abilities
+
+    # table --> BaseStats
+    findAllBaseStats(filter: BaseStatsFilter, pagination: Pagination): ListBaseStats!
+
+    # Indexes
+    baseStatsByFkPokemon( fkPokemon: Int!,filter: BaseStatsFilter, pagination: Pagination): ListBaseStats
+    baseStatsByID( iD: Int!,filter: BaseStatsFilter): BaseStats
+
+    # table --> Pokemon
     findAllPokemon(filter: PokemonFilter, pagination: Pagination): ListPokemon!
 
+    # Indexes
+    pokemonByID( iD: Int!,filter: PokemonFilter): Pokemon
+    pokemonByPokemonName( pokemonName: String!,filter: PokemonFilter, pagination: Pagination): ListPokemon
+
+    # table --> PokemonAbilities
+    findAllPokemonAbilities(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
+
+    # Indexes
+    pokemonAbilitiesByFkPokemon( fkPokemon: Int!,filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities
+    pokemonAbilitiesByID( iD: Int!,filter: PokemonAbilitiesFilter): PokemonAbilities
+    pokemonAbilitiesByFkAbility( fkAbility: Int!,filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities
+
+    # table --> PokemonEvolution
+    findAllPokemonEvolution(filter: PokemonEvolutionFilter, pagination: Pagination): ListPokemonEvolution!
+
+    # Indexes
+    pokemonEvolutionByEvolvedSpeciesID( evolvedSpeciesID: Int!,filter: PokemonEvolutionFilter, pagination: Pagination): ListPokemonEvolution
+    pokemonEvolutionByID( iD: Int!,filter: PokemonEvolutionFilter): PokemonEvolution
+
+    # table --> PokemonEvolutionMatchup
+    findAllPokemonEvolutionMatchup(filter: PokemonEvolutionMatchupFilter, pagination: Pagination): ListPokemonEvolutionMatchup!
+
+    # Indexes
+    pokemonEvolutionMatchupByPokemonID( pokemonID: Int!,filter: PokemonEvolutionMatchupFilter, pagination: Pagination): ListPokemonEvolutionMatchup
+    pokemonEvolutionMatchupByID( iD: Int!,filter: PokemonEvolutionMatchupFilter): PokemonEvolutionMatchup
+
+    # table --> PokemonTypes
+    findAllPokemonTypes(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
+
+    # Indexes
+    pokemonTypesByPokemonID( pokemonID: Int!,filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes
+    pokemonTypesByID( iD: Int!,filter: PokemonTypesFilter): PokemonTypes
+    pokemonTypesByTypeID( typeID: Int!,filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes
+
+    # table --> Types
+    findAllTypes(filter: TypesFilter, pagination: Pagination): ListTypes!
+
+    # Indexes
+    typesByID( iD: Int!,filter: TypesFilter): Types
 }
+
+
+type Mutation {
+  
+    insertAbilities(data: AbilitiesCreate!): Abilities
+    updateAbilitiesByFields(id: Int!, data: AbilitiesUpdate!): Abilities
+    deleteAbilitiesByID(id: Int!): Boolean!
+  
+    insertBaseStats(data: BaseStatsCreate!): BaseStats
+    updateBaseStatsByFields(id: Int!, data: BaseStatsUpdate!): BaseStats
+    deleteBaseStatsByID(id: Int!): Boolean!
+  
+    insertPokemon(data: PokemonCreate!): Pokemon
+    updatePokemonByFields(id: Int!, data: PokemonUpdate!): Pokemon
+    deletePokemonByID(id: Int!): Boolean!
+  
+    insertPokemonAbilities(data: PokemonAbilitiesCreate!): PokemonAbilities
+    updatePokemonAbilitiesByFields(id: Int!, data: PokemonAbilitiesUpdate!): PokemonAbilities
+    deletePokemonAbilitiesByID(id: Int!): Boolean!
+  
+    insertPokemonEvolution(data: PokemonEvolutionCreate!): PokemonEvolution
+    updatePokemonEvolutionByFields(id: Int!, data: PokemonEvolutionUpdate!): PokemonEvolution
+    deletePokemonEvolutionByID(id: Int!): Boolean!
+  
+    insertPokemonEvolutionMatchup(data: PokemonEvolutionMatchupCreate!): PokemonEvolutionMatchup
+    updatePokemonEvolutionMatchupByFields(id: Int!, data: PokemonEvolutionMatchupUpdate!): PokemonEvolutionMatchup
+    deletePokemonEvolutionMatchupByID(id: Int!): Boolean!
+  
+    insertPokemonTypes(data: PokemonTypesCreate!): PokemonTypes
+    updatePokemonTypesByFields(id: Int!, data: PokemonTypesUpdate!): PokemonTypes
+    deletePokemonTypesByID(id: Int!): Boolean!
+  
+    insertTypes(data: TypesCreate!): Types
+    updateTypesByFields(id: Int!, data: TypesUpdate!): Types
+    deleteTypesByID(id: Int!): Boolean!
+  
+
+}
+
 `, BuiltIn: false},
 	{Name: "../../sql2gql/schema/abilities.graphql", Input: `# Code generated by sql2gql. DO NOT EDIT.
 
@@ -1093,13 +1882,9 @@ type Abilities {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-
-
-
-    pokemonAbilitiesByFkAbility(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
-
+# ManyToOne
+# OneToMany
+    pokemonAbilitiesThroughFkAbility(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
 }
 input AbilitiesFilter {
     iD: FilterOnField
@@ -1138,13 +1923,9 @@ type BaseStats {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByFkPokemon(filter: PokemonFilter): Pokemon
-
-
-
-
+# ManyToOne
+    pokemonThroughFkPokemon(filter: PokemonFilter): Pokemon
+# OneToMany
 }
 input BaseStatsFilter {
     iD: FilterOnField
@@ -1198,16 +1979,12 @@ type Pokemon {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-
-
-
-    baseStatsByFkPokemon(filter: BaseStatsFilter, pagination: Pagination): ListBaseStats!
-    pokemonAbilitiesByFkPokemon(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
-    pokemonEvolutionMatchupByPokemonID(filter: PokemonEvolutionMatchupFilter, pagination: Pagination): ListPokemonEvolutionMatchup!
-    pokemonTypesByPokemonID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
-
+# ManyToOne
+# OneToMany
+    baseStatsThroughFkPokemon(filter: BaseStatsFilter, pagination: Pagination): ListBaseStats!
+    pokemonAbilitiesThroughFkPokemon(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
+    pokemonEvolutionMatchupThroughPokemonID(filter: PokemonEvolutionMatchupFilter, pagination: Pagination): ListPokemonEvolutionMatchup!
+    pokemonTypesThroughPokemonID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
 }
 input PokemonFilter {
     iD: FilterOnField
@@ -1252,14 +2029,10 @@ type PokemonAbilities {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByFkPokemon(filter: PokemonFilter): Pokemon
-    abilitiesByFkAbility(filter: AbilitiesFilter): Abilities
-
-
-
-
+# ManyToOne
+    pokemonThroughFkPokemon(filter: PokemonFilter): Pokemon
+    abilitiesThroughFkAbility(filter: AbilitiesFilter): Abilities
+# OneToMany
 }
 input PokemonAbilitiesFilter {
     iD: FilterOnField
@@ -1302,13 +2075,9 @@ type PokemonEvolution {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonEvolutionMatchupByEvolvedSpeciesID(filter: PokemonEvolutionMatchupFilter): PokemonEvolutionMatchup
-
-
-
-
+# ManyToOne
+    pokemonEvolutionMatchupThroughEvolvedSpeciesID(filter: PokemonEvolutionMatchupFilter): PokemonEvolutionMatchup
+# OneToMany
 }
 input PokemonEvolutionFilter {
     iD: FilterOnField
@@ -1349,14 +2118,10 @@ type PokemonEvolutionMatchup {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByPokemonID(filter: PokemonFilter): Pokemon
-
-
-
-    pokemonEvolutionByEvolvedSpeciesID(filter: PokemonEvolutionFilter, pagination: Pagination): ListPokemonEvolution!
-
+# ManyToOne
+    pokemonThroughPokemonID(filter: PokemonFilter): Pokemon
+# OneToMany
+    pokemonEvolutionThroughEvolvedSpeciesID(filter: PokemonEvolutionFilter, pagination: Pagination): ListPokemonEvolution!
 }
 input PokemonEvolutionMatchupFilter {
     iD: FilterOnField
@@ -1406,14 +2171,10 @@ type PokemonTypes {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByPokemonID(filter: PokemonFilter): Pokemon
-    typesByTypeID(filter: TypesFilter): Types
-
-
-
-
+# ManyToOne
+    pokemonThroughPokemonID(filter: PokemonFilter): Pokemon
+    typesThroughTypeID(filter: TypesFilter): Types
+# OneToMany
 }
 input PokemonTypesFilter {
     iD: FilterOnField
@@ -1452,13 +2213,9 @@ type Types {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-
-
-
-    pokemonTypesByTypeID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
-
+# ManyToOne
+# OneToMany
+    pokemonTypesThroughTypeID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
 }
 input TypesFilter {
     iD: FilterOnField
@@ -1498,7 +2255,6 @@ scalar NullBool
 scalar Map
 scalar FilterOnField
 
-
 input Pagination {
     page: Int
     perPage: Int
@@ -1512,22 +2268,22 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Abilities_pokemonAbilitiesByFkAbility_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Abilities_pokemonAbilitiesThroughFkAbility_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Abilities_pokemonAbilitiesByFkAbility_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_Abilities_pokemonAbilitiesThroughFkAbility_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
-	arg1, err := ec.field_Abilities_pokemonAbilitiesByFkAbility_argsPagination(ctx, rawArgs)
+	arg1, err := ec.field_Abilities_pokemonAbilitiesThroughFkAbility_argsPagination(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["pagination"] = arg1
 	return args, nil
 }
-func (ec *executionContext) field_Abilities_pokemonAbilitiesByFkAbility_argsFilter(
+func (ec *executionContext) field_Abilities_pokemonAbilitiesThroughFkAbility_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonAbilitiesFilter, error) {
@@ -1545,7 +2301,7 @@ func (ec *executionContext) field_Abilities_pokemonAbilitiesByFkAbility_argsFilt
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Abilities_pokemonAbilitiesByFkAbility_argsPagination(
+func (ec *executionContext) field_Abilities_pokemonAbilitiesThroughFkAbility_argsPagination(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*internal.Pagination, error) {
@@ -1563,17 +2319,17 @@ func (ec *executionContext) field_Abilities_pokemonAbilitiesByFkAbility_argsPagi
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_BaseStats_pokemonByFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_BaseStats_pokemonThroughFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_BaseStats_pokemonByFkPokemon_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_BaseStats_pokemonThroughFkPokemon_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_BaseStats_pokemonByFkPokemon_argsFilter(
+func (ec *executionContext) field_BaseStats_pokemonThroughFkPokemon_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonFilter, error) {
@@ -1591,17 +2347,873 @@ func (ec *executionContext) field_BaseStats_pokemonByFkPokemon_argsFilter(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_PokemonAbilities_abilitiesByFkAbility_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Mutation_deleteAbilitiesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_PokemonAbilities_abilitiesByFkAbility_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_deleteAbilitiesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteAbilitiesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteBaseStatsByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteBaseStatsByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteBaseStatsByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deletePokemonAbilitiesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deletePokemonAbilitiesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deletePokemonAbilitiesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deletePokemonByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deletePokemonByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deletePokemonByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deletePokemonEvolutionByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deletePokemonEvolutionByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deletePokemonEvolutionByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deletePokemonEvolutionMatchupByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deletePokemonEvolutionMatchupByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deletePokemonEvolutionMatchupByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deletePokemonTypesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deletePokemonTypesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deletePokemonTypesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteTypesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteTypesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteTypesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertAbilities_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertAbilities_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertAbilities_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.AbilitiesCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.AbilitiesCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNAbilitiesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilitiesCreate(ctx, tmp)
+	}
+
+	var zeroVal table.AbilitiesCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertBaseStats_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertBaseStats_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertBaseStats_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.BaseStatsCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.BaseStatsCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNBaseStatsCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsCreate(ctx, tmp)
+	}
+
+	var zeroVal table.BaseStatsCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertPokemonAbilities_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertPokemonAbilities_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertPokemonAbilities_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonAbilitiesCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonAbilitiesCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonAbilitiesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesCreate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonAbilitiesCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertPokemonEvolutionMatchup_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertPokemonEvolutionMatchup_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertPokemonEvolutionMatchup_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonEvolutionMatchupCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonEvolutionMatchupCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonEvolutionMatchupCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupCreate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonEvolutionMatchupCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertPokemonEvolution_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertPokemonEvolution_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertPokemonEvolution_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonEvolutionCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonEvolutionCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonEvolutionCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionCreate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonEvolutionCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertPokemonTypes_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertPokemonTypes_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertPokemonTypes_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonTypesCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonTypesCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonTypesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesCreate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonTypesCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertPokemon_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertPokemon_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonCreate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_insertTypes_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_insertTypes_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_insertTypes_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.TypesCreate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.TypesCreate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNTypesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesCreate(ctx, tmp)
+	}
+
+	var zeroVal table.TypesCreate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateAbilitiesByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateAbilitiesByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updateAbilitiesByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateAbilitiesByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateAbilitiesByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.AbilitiesUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.AbilitiesUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNAbilitiesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilitiesUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.AbilitiesUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateBaseStatsByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateBaseStatsByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updateBaseStatsByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateBaseStatsByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateBaseStatsByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.BaseStatsUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.BaseStatsUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNBaseStatsUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.BaseStatsUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonAbilitiesByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updatePokemonAbilitiesByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updatePokemonAbilitiesByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePokemonAbilitiesByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonAbilitiesByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonAbilitiesUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonAbilitiesUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonAbilitiesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonAbilitiesUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updatePokemonByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updatePokemonByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePokemonByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonEvolutionByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updatePokemonEvolutionByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updatePokemonEvolutionByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePokemonEvolutionByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonEvolutionByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonEvolutionUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonEvolutionUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonEvolutionUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonEvolutionUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonEvolutionMatchupByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updatePokemonEvolutionMatchupByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updatePokemonEvolutionMatchupByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePokemonEvolutionMatchupByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonEvolutionMatchupByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonEvolutionMatchupUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonEvolutionMatchupUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonEvolutionMatchupUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonEvolutionMatchupUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonTypesByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updatePokemonTypesByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updatePokemonTypesByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePokemonTypesByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePokemonTypesByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.PokemonTypesUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.PokemonTypesUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNPokemonTypesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.PokemonTypesUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTypesByFields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateTypesByFields_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updateTypesByFields_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateTypesByFields_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTypesByFields_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (table.TypesUpdate, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal table.TypesUpdate
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNTypesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesUpdate(ctx, tmp)
+	}
+
+	var zeroVal table.TypesUpdate
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_PokemonAbilities_abilitiesThroughFkAbility_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_PokemonAbilities_abilitiesThroughFkAbility_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_PokemonAbilities_abilitiesByFkAbility_argsFilter(
+func (ec *executionContext) field_PokemonAbilities_abilitiesThroughFkAbility_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.AbilitiesFilter, error) {
@@ -1619,17 +3231,17 @@ func (ec *executionContext) field_PokemonAbilities_abilitiesByFkAbility_argsFilt
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_PokemonAbilities_pokemonByFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_PokemonAbilities_pokemonThroughFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_PokemonAbilities_pokemonByFkPokemon_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_PokemonAbilities_pokemonThroughFkPokemon_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_PokemonAbilities_pokemonByFkPokemon_argsFilter(
+func (ec *executionContext) field_PokemonAbilities_pokemonThroughFkPokemon_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonFilter, error) {
@@ -1647,50 +3259,22 @@ func (ec *executionContext) field_PokemonAbilities_pokemonByFkPokemon_argsFilter
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonByPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_PokemonEvolutionMatchup_pokemonByPokemonID_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonByPokemonID_argsFilter(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*table.PokemonFilter, error) {
-	if _, ok := rawArgs["filter"]; !ok {
-		var zeroVal *table.PokemonFilter
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-	if tmp, ok := rawArgs["filter"]; ok {
-		return ec.unmarshalOPokemonFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonFilter(ctx, tmp)
-	}
-
-	var zeroVal *table.PokemonFilter
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID_argsFilter(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["filter"] = arg0
-	arg1, err := ec.field_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID_argsPagination(ctx, rawArgs)
+	arg1, err := ec.field_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID_argsPagination(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["pagination"] = arg1
 	return args, nil
 }
-func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID_argsFilter(
+func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonEvolutionFilter, error) {
@@ -1708,7 +3292,7 @@ func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionByEvol
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID_argsPagination(
+func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID_argsPagination(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*internal.Pagination, error) {
@@ -1726,45 +3310,17 @@ func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonEvolutionByEvol
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonThroughPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_PokemonEvolutionMatchup_pokemonThroughPokemonID_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID_argsFilter(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*table.PokemonEvolutionMatchupFilter, error) {
-	if _, ok := rawArgs["filter"]; !ok {
-		var zeroVal *table.PokemonEvolutionMatchupFilter
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-	if tmp, ok := rawArgs["filter"]; ok {
-		return ec.unmarshalOPokemonEvolutionMatchupFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupFilter(ctx, tmp)
-	}
-
-	var zeroVal *table.PokemonEvolutionMatchupFilter
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_PokemonTypes_pokemonByPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_PokemonTypes_pokemonByPokemonID_argsFilter(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_PokemonTypes_pokemonByPokemonID_argsFilter(
+func (ec *executionContext) field_PokemonEvolutionMatchup_pokemonThroughPokemonID_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonFilter, error) {
@@ -1782,152 +3338,17 @@ func (ec *executionContext) field_PokemonTypes_pokemonByPokemonID_argsFilter(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_PokemonTypes_typesByTypeID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_PokemonTypes_typesByTypeID_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_PokemonTypes_typesByTypeID_argsFilter(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*table.TypesFilter, error) {
-	if _, ok := rawArgs["filter"]; !ok {
-		var zeroVal *table.TypesFilter
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-	if tmp, ok := rawArgs["filter"]; ok {
-		return ec.unmarshalOTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesFilter(ctx, tmp)
-	}
-
-	var zeroVal *table.TypesFilter
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Pokemon_baseStatsByFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Pokemon_baseStatsByFkPokemon_argsFilter(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["filter"] = arg0
-	arg1, err := ec.field_Pokemon_baseStatsByFkPokemon_argsPagination(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["pagination"] = arg1
-	return args, nil
-}
-func (ec *executionContext) field_Pokemon_baseStatsByFkPokemon_argsFilter(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*table.BaseStatsFilter, error) {
-	if _, ok := rawArgs["filter"]; !ok {
-		var zeroVal *table.BaseStatsFilter
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-	if tmp, ok := rawArgs["filter"]; ok {
-		return ec.unmarshalOBaseStatsFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsFilter(ctx, tmp)
-	}
-
-	var zeroVal *table.BaseStatsFilter
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Pokemon_baseStatsByFkPokemon_argsPagination(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*internal.Pagination, error) {
-	if _, ok := rawArgs["pagination"]; !ok {
-		var zeroVal *internal.Pagination
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
-	if tmp, ok := rawArgs["pagination"]; ok {
-		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
-	}
-
-	var zeroVal *internal.Pagination
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Pokemon_pokemonAbilitiesByFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Pokemon_pokemonAbilitiesByFkPokemon_argsFilter(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["filter"] = arg0
-	arg1, err := ec.field_Pokemon_pokemonAbilitiesByFkPokemon_argsPagination(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["pagination"] = arg1
-	return args, nil
-}
-func (ec *executionContext) field_Pokemon_pokemonAbilitiesByFkPokemon_argsFilter(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*table.PokemonAbilitiesFilter, error) {
-	if _, ok := rawArgs["filter"]; !ok {
-		var zeroVal *table.PokemonAbilitiesFilter
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-	if tmp, ok := rawArgs["filter"]; ok {
-		return ec.unmarshalOPokemonAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesFilter(ctx, tmp)
-	}
-
-	var zeroVal *table.PokemonAbilitiesFilter
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Pokemon_pokemonAbilitiesByFkPokemon_argsPagination(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*internal.Pagination, error) {
-	if _, ok := rawArgs["pagination"]; !ok {
-		var zeroVal *internal.Pagination
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
-	if tmp, ok := rawArgs["pagination"]; ok {
-		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
-	}
-
-	var zeroVal *internal.Pagination
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupByPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Pokemon_pokemonEvolutionMatchupByPokemonID_argsFilter(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["filter"] = arg0
-	arg1, err := ec.field_Pokemon_pokemonEvolutionMatchupByPokemonID_argsPagination(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["pagination"] = arg1
-	return args, nil
-}
-func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupByPokemonID_argsFilter(
+func (ec *executionContext) field_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonEvolutionMatchupFilter, error) {
@@ -1945,7 +3366,96 @@ func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupByPokemonID_arg
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupByPokemonID_argsPagination(
+func (ec *executionContext) field_PokemonTypes_pokemonThroughPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_PokemonTypes_pokemonThroughPokemonID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_PokemonTypes_pokemonThroughPokemonID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_PokemonTypes_typesThroughTypeID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_PokemonTypes_typesThroughTypeID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_PokemonTypes_typesThroughTypeID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.TypesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.TypesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.TypesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Pokemon_baseStatsThroughFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Pokemon_baseStatsThroughFkPokemon_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Pokemon_baseStatsThroughFkPokemon_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Pokemon_baseStatsThroughFkPokemon_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.BaseStatsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.BaseStatsFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOBaseStatsFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.BaseStatsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Pokemon_baseStatsThroughFkPokemon_argsPagination(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*internal.Pagination, error) {
@@ -1963,22 +3473,124 @@ func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupByPokemonID_arg
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Pokemon_pokemonTypesByPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Pokemon_pokemonAbilitiesThroughFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Pokemon_pokemonTypesByPokemonID_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_Pokemon_pokemonAbilitiesThroughFkPokemon_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
-	arg1, err := ec.field_Pokemon_pokemonTypesByPokemonID_argsPagination(ctx, rawArgs)
+	arg1, err := ec.field_Pokemon_pokemonAbilitiesThroughFkPokemon_argsPagination(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["pagination"] = arg1
 	return args, nil
 }
-func (ec *executionContext) field_Pokemon_pokemonTypesByPokemonID_argsFilter(
+func (ec *executionContext) field_Pokemon_pokemonAbilitiesThroughFkPokemon_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonAbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonAbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonAbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Pokemon_pokemonAbilitiesThroughFkPokemon_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupThroughPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Pokemon_pokemonEvolutionMatchupThroughPokemonID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Pokemon_pokemonEvolutionMatchupThroughPokemonID_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupThroughPokemonID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonEvolutionMatchupFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonEvolutionMatchupFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonEvolutionMatchupFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonEvolutionMatchupFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Pokemon_pokemonEvolutionMatchupThroughPokemonID_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Pokemon_pokemonTypesThroughPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Pokemon_pokemonTypesThroughPokemonID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Pokemon_pokemonTypesThroughPokemonID_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Pokemon_pokemonTypesThroughPokemonID_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonTypesFilter, error) {
@@ -1996,7 +3608,7 @@ func (ec *executionContext) field_Pokemon_pokemonTypesByPokemonID_argsFilter(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Pokemon_pokemonTypesByPokemonID_argsPagination(
+func (ec *executionContext) field_Pokemon_pokemonTypesThroughPokemonID_argsPagination(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*internal.Pagination, error) {
@@ -2039,6 +3651,562 @@ func (ec *executionContext) field_Query___type_argsName(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_abilitiesByAbilityName_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_abilitiesByAbilityName_argsAbilityName(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["abilityName"] = arg0
+	arg1, err := ec.field_Query_abilitiesByAbilityName_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_abilitiesByAbilityName_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_abilitiesByAbilityName_argsAbilityName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["abilityName"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityName"))
+	if tmp, ok := rawArgs["abilityName"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_abilitiesByAbilityName_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.AbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.AbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.AbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_abilitiesByAbilityName_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_abilitiesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_abilitiesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_abilitiesByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_abilitiesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_abilitiesByID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.AbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.AbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.AbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_baseStatsByFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_baseStatsByFkPokemon_argsFkPokemon(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["fkPokemon"] = arg0
+	arg1, err := ec.field_Query_baseStatsByFkPokemon_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_baseStatsByFkPokemon_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_baseStatsByFkPokemon_argsFkPokemon(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["fkPokemon"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("fkPokemon"))
+	if tmp, ok := rawArgs["fkPokemon"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_baseStatsByFkPokemon_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.BaseStatsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.BaseStatsFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOBaseStatsFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.BaseStatsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_baseStatsByFkPokemon_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_baseStatsByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_baseStatsByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_baseStatsByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_baseStatsByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_baseStatsByID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.BaseStatsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.BaseStatsFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOBaseStatsFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.BaseStatsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllAbilities_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_findAllAbilities_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Query_findAllAbilities_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_findAllAbilities_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.AbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.AbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.AbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllAbilities_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllBaseStats_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_findAllBaseStats_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Query_findAllBaseStats_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_findAllBaseStats_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.BaseStatsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.BaseStatsFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOBaseStatsFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.BaseStatsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllBaseStats_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonAbilities_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_findAllPokemonAbilities_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Query_findAllPokemonAbilities_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_findAllPokemonAbilities_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonAbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonAbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonAbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonAbilities_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonEvolutionMatchup_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_findAllPokemonEvolutionMatchup_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Query_findAllPokemonEvolutionMatchup_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_findAllPokemonEvolutionMatchup_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonEvolutionMatchupFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonEvolutionMatchupFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonEvolutionMatchupFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonEvolutionMatchupFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonEvolutionMatchup_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonEvolution_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_findAllPokemonEvolution_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Query_findAllPokemonEvolution_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_findAllPokemonEvolution_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonEvolutionFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonEvolutionFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonEvolutionFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonEvolutionFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonEvolution_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonTypes_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_findAllPokemonTypes_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Query_findAllPokemonTypes_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_findAllPokemonTypes_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonTypesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonTypesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonTypesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllPokemonTypes_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
 	return zeroVal, nil
 }
 
@@ -2093,22 +4261,665 @@ func (ec *executionContext) field_Query_findAllPokemon_argsPagination(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Types_pokemonTypesByTypeID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Query_findAllTypes_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Types_pokemonTypesByTypeID_argsFilter(ctx, rawArgs)
+	arg0, err := ec.field_Query_findAllTypes_argsFilter(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["filter"] = arg0
-	arg1, err := ec.field_Types_pokemonTypesByTypeID_argsPagination(ctx, rawArgs)
+	arg1, err := ec.field_Query_findAllTypes_argsPagination(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["pagination"] = arg1
 	return args, nil
 }
-func (ec *executionContext) field_Types_pokemonTypesByTypeID_argsFilter(
+func (ec *executionContext) field_Query_findAllTypes_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.TypesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.TypesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.TypesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_findAllTypes_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkAbility_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonAbilitiesByFkAbility_argsFkAbility(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["fkAbility"] = arg0
+	arg1, err := ec.field_Query_pokemonAbilitiesByFkAbility_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_pokemonAbilitiesByFkAbility_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkAbility_argsFkAbility(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["fkAbility"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("fkAbility"))
+	if tmp, ok := rawArgs["fkAbility"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkAbility_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonAbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonAbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonAbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkAbility_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkPokemon_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonAbilitiesByFkPokemon_argsFkPokemon(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["fkPokemon"] = arg0
+	arg1, err := ec.field_Query_pokemonAbilitiesByFkPokemon_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_pokemonAbilitiesByFkPokemon_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkPokemon_argsFkPokemon(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["fkPokemon"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("fkPokemon"))
+	if tmp, ok := rawArgs["fkPokemon"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkPokemon_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonAbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonAbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonAbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByFkPokemon_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonAbilitiesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_pokemonAbilitiesByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonAbilitiesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonAbilitiesByID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonAbilitiesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonAbilitiesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonAbilitiesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_pokemonByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonByID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonByPokemonName_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonByPokemonName_argsPokemonName(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pokemonName"] = arg0
+	arg1, err := ec.field_Query_pokemonByPokemonName_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_pokemonByPokemonName_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonByPokemonName_argsPokemonName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["pokemonName"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pokemonName"))
+	if tmp, ok := rawArgs["pokemonName"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonByPokemonName_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonByPokemonName_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionByEvolvedSpeciesID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonEvolutionByEvolvedSpeciesID_argsEvolvedSpeciesID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["evolvedSpeciesID"] = arg0
+	arg1, err := ec.field_Query_pokemonEvolutionByEvolvedSpeciesID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_pokemonEvolutionByEvolvedSpeciesID_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonEvolutionByEvolvedSpeciesID_argsEvolvedSpeciesID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["evolvedSpeciesID"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("evolvedSpeciesID"))
+	if tmp, ok := rawArgs["evolvedSpeciesID"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionByEvolvedSpeciesID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonEvolutionFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonEvolutionFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonEvolutionFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonEvolutionFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionByEvolvedSpeciesID_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonEvolutionByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_pokemonEvolutionByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonEvolutionByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionByID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonEvolutionFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonEvolutionFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonEvolutionFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonEvolutionFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionMatchupByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonEvolutionMatchupByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_pokemonEvolutionMatchupByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonEvolutionMatchupByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionMatchupByID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonEvolutionMatchupFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonEvolutionMatchupFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonEvolutionMatchupFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonEvolutionMatchupFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionMatchupByPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonEvolutionMatchupByPokemonID_argsPokemonID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pokemonID"] = arg0
+	arg1, err := ec.field_Query_pokemonEvolutionMatchupByPokemonID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_pokemonEvolutionMatchupByPokemonID_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonEvolutionMatchupByPokemonID_argsPokemonID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["pokemonID"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pokemonID"))
+	if tmp, ok := rawArgs["pokemonID"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionMatchupByPokemonID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonEvolutionMatchupFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonEvolutionMatchupFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonEvolutionMatchupFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonEvolutionMatchupFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonEvolutionMatchupByPokemonID_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonTypesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonTypesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_pokemonTypesByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonTypesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonTypesByID_argsFilter(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*table.PokemonTypesFilter, error) {
@@ -2126,7 +4937,239 @@ func (ec *executionContext) field_Types_pokemonTypesByTypeID_argsFilter(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Types_pokemonTypesByTypeID_argsPagination(
+func (ec *executionContext) field_Query_pokemonTypesByPokemonID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonTypesByPokemonID_argsPokemonID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pokemonID"] = arg0
+	arg1, err := ec.field_Query_pokemonTypesByPokemonID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_pokemonTypesByPokemonID_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonTypesByPokemonID_argsPokemonID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["pokemonID"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pokemonID"))
+	if tmp, ok := rawArgs["pokemonID"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonTypesByPokemonID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonTypesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonTypesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonTypesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonTypesByPokemonID_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonTypesByTypeID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_pokemonTypesByTypeID_argsTypeID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["typeID"] = arg0
+	arg1, err := ec.field_Query_pokemonTypesByTypeID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	arg2, err := ec.field_Query_pokemonTypesByTypeID_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_pokemonTypesByTypeID_argsTypeID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["typeID"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("typeID"))
+	if tmp, ok := rawArgs["typeID"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonTypesByTypeID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonTypesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonTypesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonTypesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_pokemonTypesByTypeID_argsPagination(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*internal.Pagination, error) {
+	if _, ok := rawArgs["pagination"]; !ok {
+		var zeroVal *internal.Pagination
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+	if tmp, ok := rawArgs["pagination"]; ok {
+		return ec.unmarshalOPagination2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋinternalᚐPagination(ctx, tmp)
+	}
+
+	var zeroVal *internal.Pagination
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_typesByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_typesByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["iD"] = arg0
+	arg1, err := ec.field_Query_typesByID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_typesByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["iD"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("iD"))
+	if tmp, ok := rawArgs["iD"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_typesByID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.TypesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.TypesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.TypesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Types_pokemonTypesThroughTypeID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Types_pokemonTypesThroughTypeID_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
+	arg1, err := ec.field_Types_pokemonTypesThroughTypeID_argsPagination(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Types_pokemonTypesThroughTypeID_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*table.PokemonTypesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal *table.PokemonTypesFilter
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPokemonTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesFilter(ctx, tmp)
+	}
+
+	var zeroVal *table.PokemonTypesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Types_pokemonTypesThroughTypeID_argsPagination(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (*internal.Pagination, error) {
@@ -2478,8 +5521,8 @@ func (ec *executionContext) fieldContext_Abilities_updatedAt(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Abilities_pokemonAbilitiesByFkAbility(ctx context.Context, field graphql.CollectedField, obj *table.Abilities) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Abilities_pokemonAbilitiesByFkAbility(ctx, field)
+func (ec *executionContext) _Abilities_pokemonAbilitiesThroughFkAbility(ctx context.Context, field graphql.CollectedField, obj *table.Abilities) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Abilities_pokemonAbilitiesThroughFkAbility(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2492,7 +5535,7 @@ func (ec *executionContext) _Abilities_pokemonAbilitiesByFkAbility(ctx context.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Abilities().PokemonAbilitiesByFkAbility(rctx, obj, fc.Args["filter"].(*table.PokemonAbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
+		return ec.resolvers.Abilities().PokemonAbilitiesThroughFkAbility(rctx, obj, fc.Args["filter"].(*table.PokemonAbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2509,7 +5552,7 @@ func (ec *executionContext) _Abilities_pokemonAbilitiesByFkAbility(ctx context.C
 	return ec.marshalNListPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonAbilities(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Abilities_pokemonAbilitiesByFkAbility(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Abilities_pokemonAbilitiesThroughFkAbility(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Abilities",
 		Field:      field,
@@ -2532,7 +5575,7 @@ func (ec *executionContext) fieldContext_Abilities_pokemonAbilitiesByFkAbility(c
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Abilities_pokemonAbilitiesByFkAbility_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Abilities_pokemonAbilitiesThroughFkAbility_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2999,8 +6042,8 @@ func (ec *executionContext) fieldContext_BaseStats_updatedAt(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _BaseStats_pokemonByFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.BaseStats) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BaseStats_pokemonByFkPokemon(ctx, field)
+func (ec *executionContext) _BaseStats_pokemonThroughFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.BaseStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BaseStats_pokemonThroughFkPokemon(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3013,7 +6056,7 @@ func (ec *executionContext) _BaseStats_pokemonByFkPokemon(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.BaseStats().PokemonByFkPokemon(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
+		return ec.resolvers.BaseStats().PokemonThroughFkPokemon(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3027,7 +6070,7 @@ func (ec *executionContext) _BaseStats_pokemonByFkPokemon(ctx context.Context, f
 	return ec.marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BaseStats_pokemonByFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_BaseStats_pokemonThroughFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "BaseStats",
 		Field:      field,
@@ -3051,14 +6094,14 @@ func (ec *executionContext) fieldContext_BaseStats_pokemonByFkPokemon(ctx contex
 				return ec.fieldContext_Pokemon_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
-			case "baseStatsByFkPokemon":
-				return ec.fieldContext_Pokemon_baseStatsByFkPokemon(ctx, field)
-			case "pokemonAbilitiesByFkPokemon":
-				return ec.fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx, field)
-			case "pokemonEvolutionMatchupByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupByPokemonID(ctx, field)
-			case "pokemonTypesByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonTypesByPokemonID(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
 		},
@@ -3070,7 +6113,7 @@ func (ec *executionContext) fieldContext_BaseStats_pokemonByFkPokemon(ctx contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_BaseStats_pokemonByFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_BaseStats_pokemonThroughFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3170,8 +6213,8 @@ func (ec *executionContext) fieldContext_ListAbilities_data(_ context.Context, f
 				return ec.fieldContext_Abilities_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Abilities_updatedAt(ctx, field)
-			case "pokemonAbilitiesByFkAbility":
-				return ec.fieldContext_Abilities_pokemonAbilitiesByFkAbility(ctx, field)
+			case "pokemonAbilitiesThroughFkAbility":
+				return ec.fieldContext_Abilities_pokemonAbilitiesThroughFkAbility(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Abilities", field.Name)
 		},
@@ -3284,8 +6327,8 @@ func (ec *executionContext) fieldContext_ListBaseStats_data(_ context.Context, f
 				return ec.fieldContext_BaseStats_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_BaseStats_updatedAt(ctx, field)
-			case "pokemonByFkPokemon":
-				return ec.fieldContext_BaseStats_pokemonByFkPokemon(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_BaseStats_pokemonThroughFkPokemon(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BaseStats", field.Name)
 		},
@@ -3392,14 +6435,14 @@ func (ec *executionContext) fieldContext_ListPokemon_data(_ context.Context, fie
 				return ec.fieldContext_Pokemon_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
-			case "baseStatsByFkPokemon":
-				return ec.fieldContext_Pokemon_baseStatsByFkPokemon(ctx, field)
-			case "pokemonAbilitiesByFkPokemon":
-				return ec.fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx, field)
-			case "pokemonEvolutionMatchupByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupByPokemonID(ctx, field)
-			case "pokemonTypesByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonTypesByPokemonID(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
 		},
@@ -3506,10 +6549,10 @@ func (ec *executionContext) fieldContext_ListPokemonAbilities_data(_ context.Con
 				return ec.fieldContext_PokemonAbilities_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_PokemonAbilities_updatedAt(ctx, field)
-			case "pokemonByFkPokemon":
-				return ec.fieldContext_PokemonAbilities_pokemonByFkPokemon(ctx, field)
-			case "abilitiesByFkAbility":
-				return ec.fieldContext_PokemonAbilities_abilitiesByFkAbility(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_PokemonAbilities_pokemonThroughFkPokemon(ctx, field)
+			case "abilitiesThroughFkAbility":
+				return ec.fieldContext_PokemonAbilities_abilitiesThroughFkAbility(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PokemonAbilities", field.Name)
 		},
@@ -3612,8 +6655,8 @@ func (ec *executionContext) fieldContext_ListPokemonEvolution_data(_ context.Con
 				return ec.fieldContext_PokemonEvolution_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_PokemonEvolution_updatedAt(ctx, field)
-			case "pokemonEvolutionMatchupByEvolvedSpeciesID":
-				return ec.fieldContext_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID(ctx, field)
+			case "pokemonEvolutionMatchupThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolution", field.Name)
 		},
@@ -3724,10 +6767,10 @@ func (ec *executionContext) fieldContext_ListPokemonEvolutionMatchup_data(_ cont
 				return ec.fieldContext_PokemonEvolutionMatchup_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_PokemonEvolutionMatchup_updatedAt(ctx, field)
-			case "pokemonByPokemonID":
-				return ec.fieldContext_PokemonEvolutionMatchup_pokemonByPokemonID(ctx, field)
-			case "pokemonEvolutionByEvolvedSpeciesID":
-				return ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx, field)
+			case "pokemonEvolutionThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolutionMatchup", field.Name)
 		},
@@ -3832,10 +6875,10 @@ func (ec *executionContext) fieldContext_ListPokemonTypes_data(_ context.Context
 				return ec.fieldContext_PokemonTypes_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_PokemonTypes_updatedAt(ctx, field)
-			case "pokemonByPokemonID":
-				return ec.fieldContext_PokemonTypes_pokemonByPokemonID(ctx, field)
-			case "typesByTypeID":
-				return ec.fieldContext_PokemonTypes_typesByTypeID(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonTypes_pokemonThroughPokemonID(ctx, field)
+			case "typesThroughTypeID":
+				return ec.fieldContext_PokemonTypes_typesThroughTypeID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PokemonTypes", field.Name)
 		},
@@ -3936,11 +6979,1611 @@ func (ec *executionContext) fieldContext_ListTypes_data(_ context.Context, field
 				return ec.fieldContext_Types_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Types_updatedAt(ctx, field)
-			case "pokemonTypesByTypeID":
-				return ec.fieldContext_Types_pokemonTypesByTypeID(ctx, field)
+			case "pokemonTypesThroughTypeID":
+				return ec.fieldContext_Types_pokemonTypesThroughTypeID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Types", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertAbilities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertAbilities(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertAbilities(rctx, fc.Args["data"].(table.AbilitiesCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Abilities)
+	fc.Result = res
+	return ec.marshalOAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertAbilities(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Abilities_iD(ctx, field)
+			case "abilityName":
+				return ec.fieldContext_Abilities_abilityName(ctx, field)
+			case "active":
+				return ec.fieldContext_Abilities_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Abilities_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Abilities_updatedAt(ctx, field)
+			case "pokemonAbilitiesThroughFkAbility":
+				return ec.fieldContext_Abilities_pokemonAbilitiesThroughFkAbility(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Abilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertAbilities_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateAbilitiesByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateAbilitiesByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAbilitiesByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.AbilitiesUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Abilities)
+	fc.Result = res
+	return ec.marshalOAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateAbilitiesByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Abilities_iD(ctx, field)
+			case "abilityName":
+				return ec.fieldContext_Abilities_abilityName(ctx, field)
+			case "active":
+				return ec.fieldContext_Abilities_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Abilities_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Abilities_updatedAt(ctx, field)
+			case "pokemonAbilitiesThroughFkAbility":
+				return ec.fieldContext_Abilities_pokemonAbilitiesThroughFkAbility(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Abilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateAbilitiesByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteAbilitiesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteAbilitiesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAbilitiesByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteAbilitiesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteAbilitiesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertBaseStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertBaseStats(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertBaseStats(rctx, fc.Args["data"].(table.BaseStatsCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.BaseStats)
+	fc.Result = res
+	return ec.marshalOBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStats(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertBaseStats(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_BaseStats_iD(ctx, field)
+			case "fkPokemon":
+				return ec.fieldContext_BaseStats_fkPokemon(ctx, field)
+			case "bHp":
+				return ec.fieldContext_BaseStats_bHp(ctx, field)
+			case "bAtk":
+				return ec.fieldContext_BaseStats_bAtk(ctx, field)
+			case "bDef":
+				return ec.fieldContext_BaseStats_bDef(ctx, field)
+			case "bSpAtk":
+				return ec.fieldContext_BaseStats_bSpAtk(ctx, field)
+			case "bSpDef":
+				return ec.fieldContext_BaseStats_bSpDef(ctx, field)
+			case "bSpeed":
+				return ec.fieldContext_BaseStats_bSpeed(ctx, field)
+			case "active":
+				return ec.fieldContext_BaseStats_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_BaseStats_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_BaseStats_updatedAt(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_BaseStats_pokemonThroughFkPokemon(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BaseStats", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertBaseStats_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateBaseStatsByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateBaseStatsByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateBaseStatsByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.BaseStatsUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.BaseStats)
+	fc.Result = res
+	return ec.marshalOBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStats(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateBaseStatsByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_BaseStats_iD(ctx, field)
+			case "fkPokemon":
+				return ec.fieldContext_BaseStats_fkPokemon(ctx, field)
+			case "bHp":
+				return ec.fieldContext_BaseStats_bHp(ctx, field)
+			case "bAtk":
+				return ec.fieldContext_BaseStats_bAtk(ctx, field)
+			case "bDef":
+				return ec.fieldContext_BaseStats_bDef(ctx, field)
+			case "bSpAtk":
+				return ec.fieldContext_BaseStats_bSpAtk(ctx, field)
+			case "bSpDef":
+				return ec.fieldContext_BaseStats_bSpDef(ctx, field)
+			case "bSpeed":
+				return ec.fieldContext_BaseStats_bSpeed(ctx, field)
+			case "active":
+				return ec.fieldContext_BaseStats_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_BaseStats_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_BaseStats_updatedAt(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_BaseStats_pokemonThroughFkPokemon(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BaseStats", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateBaseStatsByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteBaseStatsByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteBaseStatsByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteBaseStatsByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteBaseStatsByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteBaseStatsByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertPokemon(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertPokemon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertPokemon(rctx, fc.Args["data"].(table.PokemonCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Pokemon)
+	fc.Result = res
+	return ec.marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Pokemon_iD(ctx, field)
+			case "pokemonName":
+				return ec.fieldContext_Pokemon_pokemonName(ctx, field)
+			case "pokemonHeight":
+				return ec.fieldContext_Pokemon_pokemonHeight(ctx, field)
+			case "pokemonWeight":
+				return ec.fieldContext_Pokemon_pokemonWeight(ctx, field)
+			case "pokemonBaseExperience":
+				return ec.fieldContext_Pokemon_pokemonBaseExperience(ctx, field)
+			case "active":
+				return ec.fieldContext_Pokemon_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Pokemon_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePokemonByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePokemonByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePokemonByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.PokemonUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Pokemon)
+	fc.Result = res
+	return ec.marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePokemonByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Pokemon_iD(ctx, field)
+			case "pokemonName":
+				return ec.fieldContext_Pokemon_pokemonName(ctx, field)
+			case "pokemonHeight":
+				return ec.fieldContext_Pokemon_pokemonHeight(ctx, field)
+			case "pokemonWeight":
+				return ec.fieldContext_Pokemon_pokemonWeight(ctx, field)
+			case "pokemonBaseExperience":
+				return ec.fieldContext_Pokemon_pokemonBaseExperience(ctx, field)
+			case "active":
+				return ec.fieldContext_Pokemon_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Pokemon_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePokemonByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePokemonByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePokemonByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePokemonByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePokemonByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePokemonByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertPokemonAbilities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertPokemonAbilities(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertPokemonAbilities(rctx, fc.Args["data"].(table.PokemonAbilitiesCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonAbilities)
+	fc.Result = res
+	return ec.marshalOPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertPokemonAbilities(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonAbilities_iD(ctx, field)
+			case "fkPokemon":
+				return ec.fieldContext_PokemonAbilities_fkPokemon(ctx, field)
+			case "fkAbility":
+				return ec.fieldContext_PokemonAbilities_fkAbility(ctx, field)
+			case "isHidden":
+				return ec.fieldContext_PokemonAbilities_isHidden(ctx, field)
+			case "slot":
+				return ec.fieldContext_PokemonAbilities_slot(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonAbilities_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonAbilities_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonAbilities_updatedAt(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_PokemonAbilities_pokemonThroughFkPokemon(ctx, field)
+			case "abilitiesThroughFkAbility":
+				return ec.fieldContext_PokemonAbilities_abilitiesThroughFkAbility(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertPokemonAbilities_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePokemonAbilitiesByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePokemonAbilitiesByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePokemonAbilitiesByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.PokemonAbilitiesUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonAbilities)
+	fc.Result = res
+	return ec.marshalOPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePokemonAbilitiesByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonAbilities_iD(ctx, field)
+			case "fkPokemon":
+				return ec.fieldContext_PokemonAbilities_fkPokemon(ctx, field)
+			case "fkAbility":
+				return ec.fieldContext_PokemonAbilities_fkAbility(ctx, field)
+			case "isHidden":
+				return ec.fieldContext_PokemonAbilities_isHidden(ctx, field)
+			case "slot":
+				return ec.fieldContext_PokemonAbilities_slot(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonAbilities_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonAbilities_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonAbilities_updatedAt(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_PokemonAbilities_pokemonThroughFkPokemon(ctx, field)
+			case "abilitiesThroughFkAbility":
+				return ec.fieldContext_PokemonAbilities_abilitiesThroughFkAbility(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePokemonAbilitiesByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePokemonAbilitiesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePokemonAbilitiesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePokemonAbilitiesByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePokemonAbilitiesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePokemonAbilitiesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertPokemonEvolution(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertPokemonEvolution(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertPokemonEvolution(rctx, fc.Args["data"].(table.PokemonEvolutionCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonEvolution)
+	fc.Result = res
+	return ec.marshalOPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolution(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertPokemonEvolution(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonEvolution_iD(ctx, field)
+			case "evolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolution_evolvedSpeciesID(ctx, field)
+			case "evolMinimumLevel":
+				return ec.fieldContext_PokemonEvolution_evolMinimumLevel(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonEvolution_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonEvolution_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonEvolution_updatedAt(ctx, field)
+			case "pokemonEvolutionMatchupThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolution", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertPokemonEvolution_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePokemonEvolutionByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePokemonEvolutionByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePokemonEvolutionByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.PokemonEvolutionUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonEvolution)
+	fc.Result = res
+	return ec.marshalOPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolution(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePokemonEvolutionByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonEvolution_iD(ctx, field)
+			case "evolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolution_evolvedSpeciesID(ctx, field)
+			case "evolMinimumLevel":
+				return ec.fieldContext_PokemonEvolution_evolMinimumLevel(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonEvolution_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonEvolution_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonEvolution_updatedAt(ctx, field)
+			case "pokemonEvolutionMatchupThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolution", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePokemonEvolutionByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePokemonEvolutionByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePokemonEvolutionByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePokemonEvolutionByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePokemonEvolutionByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePokemonEvolutionByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertPokemonEvolutionMatchup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertPokemonEvolutionMatchup(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertPokemonEvolutionMatchup(rctx, fc.Args["data"].(table.PokemonEvolutionMatchupCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonEvolutionMatchup)
+	fc.Result = res
+	return ec.marshalOPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertPokemonEvolutionMatchup(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonEvolutionMatchup_iD(ctx, field)
+			case "pokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonID(ctx, field)
+			case "evolvesFromSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_evolvesFromSpeciesID(ctx, field)
+			case "habitat":
+				return ec.fieldContext_PokemonEvolutionMatchup_habitat(ctx, field)
+			case "genderRate":
+				return ec.fieldContext_PokemonEvolutionMatchup_genderRate(ctx, field)
+			case "captureRate":
+				return ec.fieldContext_PokemonEvolutionMatchup_captureRate(ctx, field)
+			case "baseHappiness":
+				return ec.fieldContext_PokemonEvolutionMatchup_baseHappiness(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonEvolutionMatchup_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonEvolutionMatchup_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonEvolutionMatchup_updatedAt(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx, field)
+			case "pokemonEvolutionThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolutionMatchup", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertPokemonEvolutionMatchup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePokemonEvolutionMatchupByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePokemonEvolutionMatchupByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePokemonEvolutionMatchupByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.PokemonEvolutionMatchupUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonEvolutionMatchup)
+	fc.Result = res
+	return ec.marshalOPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePokemonEvolutionMatchupByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonEvolutionMatchup_iD(ctx, field)
+			case "pokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonID(ctx, field)
+			case "evolvesFromSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_evolvesFromSpeciesID(ctx, field)
+			case "habitat":
+				return ec.fieldContext_PokemonEvolutionMatchup_habitat(ctx, field)
+			case "genderRate":
+				return ec.fieldContext_PokemonEvolutionMatchup_genderRate(ctx, field)
+			case "captureRate":
+				return ec.fieldContext_PokemonEvolutionMatchup_captureRate(ctx, field)
+			case "baseHappiness":
+				return ec.fieldContext_PokemonEvolutionMatchup_baseHappiness(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonEvolutionMatchup_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonEvolutionMatchup_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonEvolutionMatchup_updatedAt(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx, field)
+			case "pokemonEvolutionThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolutionMatchup", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePokemonEvolutionMatchupByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePokemonEvolutionMatchupByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePokemonEvolutionMatchupByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePokemonEvolutionMatchupByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePokemonEvolutionMatchupByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePokemonEvolutionMatchupByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertPokemonTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertPokemonTypes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertPokemonTypes(rctx, fc.Args["data"].(table.PokemonTypesCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonTypes)
+	fc.Result = res
+	return ec.marshalOPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertPokemonTypes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonTypes_iD(ctx, field)
+			case "pokemonID":
+				return ec.fieldContext_PokemonTypes_pokemonID(ctx, field)
+			case "typeID":
+				return ec.fieldContext_PokemonTypes_typeID(ctx, field)
+			case "slot":
+				return ec.fieldContext_PokemonTypes_slot(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonTypes_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonTypes_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonTypes_updatedAt(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonTypes_pokemonThroughPokemonID(ctx, field)
+			case "typesThroughTypeID":
+				return ec.fieldContext_PokemonTypes_typesThroughTypeID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonTypes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertPokemonTypes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePokemonTypesByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePokemonTypesByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePokemonTypesByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.PokemonTypesUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonTypes)
+	fc.Result = res
+	return ec.marshalOPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePokemonTypesByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonTypes_iD(ctx, field)
+			case "pokemonID":
+				return ec.fieldContext_PokemonTypes_pokemonID(ctx, field)
+			case "typeID":
+				return ec.fieldContext_PokemonTypes_typeID(ctx, field)
+			case "slot":
+				return ec.fieldContext_PokemonTypes_slot(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonTypes_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonTypes_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonTypes_updatedAt(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonTypes_pokemonThroughPokemonID(ctx, field)
+			case "typesThroughTypeID":
+				return ec.fieldContext_PokemonTypes_typesThroughTypeID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonTypes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePokemonTypesByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deletePokemonTypesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deletePokemonTypesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePokemonTypesByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deletePokemonTypesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deletePokemonTypesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_insertTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertTypes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertTypes(rctx, fc.Args["data"].(table.TypesCreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Types)
+	fc.Result = res
+	return ec.marshalOTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertTypes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Types_iD(ctx, field)
+			case "typeName":
+				return ec.fieldContext_Types_typeName(ctx, field)
+			case "active":
+				return ec.fieldContext_Types_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Types_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Types_updatedAt(ctx, field)
+			case "pokemonTypesThroughTypeID":
+				return ec.fieldContext_Types_pokemonTypesThroughTypeID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Types", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertTypes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateTypesByFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateTypesByFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateTypesByFields(rctx, fc.Args["id"].(int), fc.Args["data"].(table.TypesUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Types)
+	fc.Result = res
+	return ec.marshalOTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateTypesByFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Types_iD(ctx, field)
+			case "typeName":
+				return ec.fieldContext_Types_typeName(ctx, field)
+			case "active":
+				return ec.fieldContext_Types_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Types_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Types_updatedAt(ctx, field)
+			case "pokemonTypesThroughTypeID":
+				return ec.fieldContext_Types_pokemonTypesThroughTypeID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Types", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateTypesByFields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteTypesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTypesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTypesByID(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTypesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTypesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -4282,8 +8925,8 @@ func (ec *executionContext) fieldContext_Pokemon_updatedAt(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Pokemon_baseStatsByFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Pokemon_baseStatsByFkPokemon(ctx, field)
+func (ec *executionContext) _Pokemon_baseStatsThroughFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4296,7 +8939,7 @@ func (ec *executionContext) _Pokemon_baseStatsByFkPokemon(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Pokemon().BaseStatsByFkPokemon(rctx, obj, fc.Args["filter"].(*table.BaseStatsFilter), fc.Args["pagination"].(*internal.Pagination))
+		return ec.resolvers.Pokemon().BaseStatsThroughFkPokemon(rctx, obj, fc.Args["filter"].(*table.BaseStatsFilter), fc.Args["pagination"].(*internal.Pagination))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4313,7 +8956,7 @@ func (ec *executionContext) _Pokemon_baseStatsByFkPokemon(ctx context.Context, f
 	return ec.marshalNListBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListBaseStats(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Pokemon_baseStatsByFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Pokemon",
 		Field:      field,
@@ -4336,15 +8979,15 @@ func (ec *executionContext) fieldContext_Pokemon_baseStatsByFkPokemon(ctx contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Pokemon_baseStatsByFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Pokemon_baseStatsThroughFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Pokemon_pokemonAbilitiesByFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx, field)
+func (ec *executionContext) _Pokemon_pokemonAbilitiesThroughFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4357,7 +9000,7 @@ func (ec *executionContext) _Pokemon_pokemonAbilitiesByFkPokemon(ctx context.Con
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Pokemon().PokemonAbilitiesByFkPokemon(rctx, obj, fc.Args["filter"].(*table.PokemonAbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
+		return ec.resolvers.Pokemon().PokemonAbilitiesThroughFkPokemon(rctx, obj, fc.Args["filter"].(*table.PokemonAbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4374,7 +9017,7 @@ func (ec *executionContext) _Pokemon_pokemonAbilitiesByFkPokemon(ctx context.Con
 	return ec.marshalNListPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonAbilities(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Pokemon",
 		Field:      field,
@@ -4397,15 +9040,15 @@ func (ec *executionContext) fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Pokemon_pokemonAbilitiesByFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Pokemon_pokemonAbilitiesThroughFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Pokemon_pokemonEvolutionMatchupByPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Pokemon_pokemonEvolutionMatchupByPokemonID(ctx, field)
+func (ec *executionContext) _Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4418,7 +9061,7 @@ func (ec *executionContext) _Pokemon_pokemonEvolutionMatchupByPokemonID(ctx cont
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Pokemon().PokemonEvolutionMatchupByPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonEvolutionMatchupFilter), fc.Args["pagination"].(*internal.Pagination))
+		return ec.resolvers.Pokemon().PokemonEvolutionMatchupThroughPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonEvolutionMatchupFilter), fc.Args["pagination"].(*internal.Pagination))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4435,7 +9078,7 @@ func (ec *executionContext) _Pokemon_pokemonEvolutionMatchupByPokemonID(ctx cont
 	return ec.marshalNListPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolutionMatchup(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Pokemon_pokemonEvolutionMatchupByPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Pokemon",
 		Field:      field,
@@ -4458,15 +9101,15 @@ func (ec *executionContext) fieldContext_Pokemon_pokemonEvolutionMatchupByPokemo
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Pokemon_pokemonEvolutionMatchupByPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Pokemon_pokemonEvolutionMatchupThroughPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Pokemon_pokemonTypesByPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Pokemon_pokemonTypesByPokemonID(ctx, field)
+func (ec *executionContext) _Pokemon_pokemonTypesThroughPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.Pokemon) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4479,7 +9122,7 @@ func (ec *executionContext) _Pokemon_pokemonTypesByPokemonID(ctx context.Context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Pokemon().PokemonTypesByPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonTypesFilter), fc.Args["pagination"].(*internal.Pagination))
+		return ec.resolvers.Pokemon().PokemonTypesThroughPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonTypesFilter), fc.Args["pagination"].(*internal.Pagination))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4496,7 +9139,7 @@ func (ec *executionContext) _Pokemon_pokemonTypesByPokemonID(ctx context.Context
 	return ec.marshalNListPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonTypes(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Pokemon_pokemonTypesByPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Pokemon",
 		Field:      field,
@@ -4519,7 +9162,7 @@ func (ec *executionContext) fieldContext_Pokemon_pokemonTypesByPokemonID(ctx con
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Pokemon_pokemonTypesByPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Pokemon_pokemonTypesThroughPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4872,8 +9515,8 @@ func (ec *executionContext) fieldContext_PokemonAbilities_updatedAt(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _PokemonAbilities_pokemonByFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.PokemonAbilities) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PokemonAbilities_pokemonByFkPokemon(ctx, field)
+func (ec *executionContext) _PokemonAbilities_pokemonThroughFkPokemon(ctx context.Context, field graphql.CollectedField, obj *table.PokemonAbilities) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PokemonAbilities_pokemonThroughFkPokemon(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4886,7 +9529,7 @@ func (ec *executionContext) _PokemonAbilities_pokemonByFkPokemon(ctx context.Con
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PokemonAbilities().PokemonByFkPokemon(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
+		return ec.resolvers.PokemonAbilities().PokemonThroughFkPokemon(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4900,7 +9543,7 @@ func (ec *executionContext) _PokemonAbilities_pokemonByFkPokemon(ctx context.Con
 	return ec.marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PokemonAbilities_pokemonByFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PokemonAbilities_pokemonThroughFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PokemonAbilities",
 		Field:      field,
@@ -4924,14 +9567,14 @@ func (ec *executionContext) fieldContext_PokemonAbilities_pokemonByFkPokemon(ctx
 				return ec.fieldContext_Pokemon_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
-			case "baseStatsByFkPokemon":
-				return ec.fieldContext_Pokemon_baseStatsByFkPokemon(ctx, field)
-			case "pokemonAbilitiesByFkPokemon":
-				return ec.fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx, field)
-			case "pokemonEvolutionMatchupByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupByPokemonID(ctx, field)
-			case "pokemonTypesByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonTypesByPokemonID(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
 		},
@@ -4943,15 +9586,15 @@ func (ec *executionContext) fieldContext_PokemonAbilities_pokemonByFkPokemon(ctx
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PokemonAbilities_pokemonByFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_PokemonAbilities_pokemonThroughFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _PokemonAbilities_abilitiesByFkAbility(ctx context.Context, field graphql.CollectedField, obj *table.PokemonAbilities) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PokemonAbilities_abilitiesByFkAbility(ctx, field)
+func (ec *executionContext) _PokemonAbilities_abilitiesThroughFkAbility(ctx context.Context, field graphql.CollectedField, obj *table.PokemonAbilities) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PokemonAbilities_abilitiesThroughFkAbility(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4964,7 +9607,7 @@ func (ec *executionContext) _PokemonAbilities_abilitiesByFkAbility(ctx context.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PokemonAbilities().AbilitiesByFkAbility(rctx, obj, fc.Args["filter"].(*table.AbilitiesFilter))
+		return ec.resolvers.PokemonAbilities().AbilitiesThroughFkAbility(rctx, obj, fc.Args["filter"].(*table.AbilitiesFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4978,7 +9621,7 @@ func (ec *executionContext) _PokemonAbilities_abilitiesByFkAbility(ctx context.C
 	return ec.marshalOAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilities(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PokemonAbilities_abilitiesByFkAbility(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PokemonAbilities_abilitiesThroughFkAbility(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PokemonAbilities",
 		Field:      field,
@@ -4996,8 +9639,8 @@ func (ec *executionContext) fieldContext_PokemonAbilities_abilitiesByFkAbility(c
 				return ec.fieldContext_Abilities_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Abilities_updatedAt(ctx, field)
-			case "pokemonAbilitiesByFkAbility":
-				return ec.fieldContext_Abilities_pokemonAbilitiesByFkAbility(ctx, field)
+			case "pokemonAbilitiesThroughFkAbility":
+				return ec.fieldContext_Abilities_pokemonAbilitiesThroughFkAbility(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Abilities", field.Name)
 		},
@@ -5009,7 +9652,7 @@ func (ec *executionContext) fieldContext_PokemonAbilities_abilitiesByFkAbility(c
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PokemonAbilities_abilitiesByFkAbility_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_PokemonAbilities_abilitiesThroughFkAbility_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5271,8 +9914,8 @@ func (ec *executionContext) fieldContext_PokemonEvolution_updatedAt(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonEvolution) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID(ctx, field)
+func (ec *executionContext) _PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonEvolution) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5285,7 +9928,7 @@ func (ec *executionContext) _PokemonEvolution_pokemonEvolutionMatchupByEvolvedSp
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PokemonEvolution().PokemonEvolutionMatchupByEvolvedSpeciesID(rctx, obj, fc.Args["filter"].(*table.PokemonEvolutionMatchupFilter))
+		return ec.resolvers.PokemonEvolution().PokemonEvolutionMatchupThroughEvolvedSpeciesID(rctx, obj, fc.Args["filter"].(*table.PokemonEvolutionMatchupFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5299,7 +9942,7 @@ func (ec *executionContext) _PokemonEvolution_pokemonEvolutionMatchupByEvolvedSp
 	return ec.marshalOPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchup(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PokemonEvolution",
 		Field:      field,
@@ -5327,10 +9970,10 @@ func (ec *executionContext) fieldContext_PokemonEvolution_pokemonEvolutionMatchu
 				return ec.fieldContext_PokemonEvolutionMatchup_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_PokemonEvolutionMatchup_updatedAt(ctx, field)
-			case "pokemonByPokemonID":
-				return ec.fieldContext_PokemonEvolutionMatchup_pokemonByPokemonID(ctx, field)
-			case "pokemonEvolutionByEvolvedSpeciesID":
-				return ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx, field)
+			case "pokemonEvolutionThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolutionMatchup", field.Name)
 		},
@@ -5342,7 +9985,7 @@ func (ec *executionContext) fieldContext_PokemonEvolution_pokemonEvolutionMatchu
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5777,8 +10420,8 @@ func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_updatedAt(_ con
 	return fc, nil
 }
 
-func (ec *executionContext) _PokemonEvolutionMatchup_pokemonByPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonEvolutionMatchup) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PokemonEvolutionMatchup_pokemonByPokemonID(ctx, field)
+func (ec *executionContext) _PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonEvolutionMatchup) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5791,7 +10434,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup_pokemonByPokemonID(ctx cont
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PokemonEvolutionMatchup().PokemonByPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
+		return ec.resolvers.PokemonEvolutionMatchup().PokemonThroughPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5805,7 +10448,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup_pokemonByPokemonID(ctx cont
 	return ec.marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_pokemonByPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PokemonEvolutionMatchup",
 		Field:      field,
@@ -5829,14 +10472,14 @@ func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_pokemonByPokemo
 				return ec.fieldContext_Pokemon_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
-			case "baseStatsByFkPokemon":
-				return ec.fieldContext_Pokemon_baseStatsByFkPokemon(ctx, field)
-			case "pokemonAbilitiesByFkPokemon":
-				return ec.fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx, field)
-			case "pokemonEvolutionMatchupByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupByPokemonID(ctx, field)
-			case "pokemonTypesByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonTypesByPokemonID(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
 		},
@@ -5848,15 +10491,15 @@ func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_pokemonByPokemo
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PokemonEvolutionMatchup_pokemonByPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_PokemonEvolutionMatchup_pokemonThroughPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonEvolutionMatchup) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID(ctx, field)
+func (ec *executionContext) _PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonEvolutionMatchup) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5869,7 +10512,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSp
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PokemonEvolutionMatchup().PokemonEvolutionByEvolvedSpeciesID(rctx, obj, fc.Args["filter"].(*table.PokemonEvolutionFilter), fc.Args["pagination"].(*internal.Pagination))
+		return ec.resolvers.PokemonEvolutionMatchup().PokemonEvolutionThroughEvolvedSpeciesID(rctx, obj, fc.Args["filter"].(*table.PokemonEvolutionFilter), fc.Args["pagination"].(*internal.Pagination))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5886,7 +10529,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSp
 	return ec.marshalNListPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolution(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PokemonEvolutionMatchup",
 		Field:      field,
@@ -5909,7 +10552,7 @@ func (ec *executionContext) fieldContext_PokemonEvolutionMatchup_pokemonEvolutio
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6218,8 +10861,8 @@ func (ec *executionContext) fieldContext_PokemonTypes_updatedAt(_ context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _PokemonTypes_pokemonByPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonTypes) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PokemonTypes_pokemonByPokemonID(ctx, field)
+func (ec *executionContext) _PokemonTypes_pokemonThroughPokemonID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonTypes) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PokemonTypes_pokemonThroughPokemonID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6232,7 +10875,7 @@ func (ec *executionContext) _PokemonTypes_pokemonByPokemonID(ctx context.Context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PokemonTypes().PokemonByPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
+		return ec.resolvers.PokemonTypes().PokemonThroughPokemonID(rctx, obj, fc.Args["filter"].(*table.PokemonFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6246,7 +10889,7 @@ func (ec *executionContext) _PokemonTypes_pokemonByPokemonID(ctx context.Context
 	return ec.marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PokemonTypes_pokemonByPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PokemonTypes_pokemonThroughPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PokemonTypes",
 		Field:      field,
@@ -6270,14 +10913,14 @@ func (ec *executionContext) fieldContext_PokemonTypes_pokemonByPokemonID(ctx con
 				return ec.fieldContext_Pokemon_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
-			case "baseStatsByFkPokemon":
-				return ec.fieldContext_Pokemon_baseStatsByFkPokemon(ctx, field)
-			case "pokemonAbilitiesByFkPokemon":
-				return ec.fieldContext_Pokemon_pokemonAbilitiesByFkPokemon(ctx, field)
-			case "pokemonEvolutionMatchupByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupByPokemonID(ctx, field)
-			case "pokemonTypesByPokemonID":
-				return ec.fieldContext_Pokemon_pokemonTypesByPokemonID(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
 		},
@@ -6289,15 +10932,15 @@ func (ec *executionContext) fieldContext_PokemonTypes_pokemonByPokemonID(ctx con
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PokemonTypes_pokemonByPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_PokemonTypes_pokemonThroughPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _PokemonTypes_typesByTypeID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonTypes) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PokemonTypes_typesByTypeID(ctx, field)
+func (ec *executionContext) _PokemonTypes_typesThroughTypeID(ctx context.Context, field graphql.CollectedField, obj *table.PokemonTypes) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PokemonTypes_typesThroughTypeID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6310,7 +10953,7 @@ func (ec *executionContext) _PokemonTypes_typesByTypeID(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PokemonTypes().TypesByTypeID(rctx, obj, fc.Args["filter"].(*table.TypesFilter))
+		return ec.resolvers.PokemonTypes().TypesThroughTypeID(rctx, obj, fc.Args["filter"].(*table.TypesFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6324,7 +10967,7 @@ func (ec *executionContext) _PokemonTypes_typesByTypeID(ctx context.Context, fie
 	return ec.marshalOTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypes(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PokemonTypes_typesByTypeID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PokemonTypes_typesThroughTypeID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PokemonTypes",
 		Field:      field,
@@ -6342,8 +10985,8 @@ func (ec *executionContext) fieldContext_PokemonTypes_typesByTypeID(ctx context.
 				return ec.fieldContext_Types_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Types_updatedAt(ctx, field)
-			case "pokemonTypesByTypeID":
-				return ec.fieldContext_Types_pokemonTypesByTypeID(ctx, field)
+			case "pokemonTypesThroughTypeID":
+				return ec.fieldContext_Types_pokemonTypesThroughTypeID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Types", field.Name)
 		},
@@ -6355,7 +10998,389 @@ func (ec *executionContext) fieldContext_PokemonTypes_typesByTypeID(ctx context.
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PokemonTypes_typesByTypeID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_PokemonTypes_typesThroughTypeID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_findAllAbilities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_findAllAbilities(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindAllAbilities(rctx, fc.Args["filter"].(*table.AbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListAbilities)
+	fc.Result = res
+	return ec.marshalNListAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_findAllAbilities(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListAbilities_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListAbilities_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_findAllAbilities_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_abilitiesByAbilityName(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_abilitiesByAbilityName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AbilitiesByAbilityName(rctx, fc.Args["abilityName"].(string), fc.Args["filter"].(*table.AbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListAbilities)
+	fc.Result = res
+	return ec.marshalOListAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_abilitiesByAbilityName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListAbilities_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListAbilities_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_abilitiesByAbilityName_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_abilitiesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_abilitiesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AbilitiesByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.AbilitiesFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Abilities)
+	fc.Result = res
+	return ec.marshalOAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_abilitiesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Abilities_iD(ctx, field)
+			case "abilityName":
+				return ec.fieldContext_Abilities_abilityName(ctx, field)
+			case "active":
+				return ec.fieldContext_Abilities_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Abilities_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Abilities_updatedAt(ctx, field)
+			case "pokemonAbilitiesThroughFkAbility":
+				return ec.fieldContext_Abilities_pokemonAbilitiesThroughFkAbility(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Abilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_abilitiesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_findAllBaseStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_findAllBaseStats(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindAllBaseStats(rctx, fc.Args["filter"].(*table.BaseStatsFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListBaseStats)
+	fc.Result = res
+	return ec.marshalNListBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListBaseStats(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_findAllBaseStats(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListBaseStats_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListBaseStats_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListBaseStats", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_findAllBaseStats_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_baseStatsByFkPokemon(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_baseStatsByFkPokemon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().BaseStatsByFkPokemon(rctx, fc.Args["fkPokemon"].(int), fc.Args["filter"].(*table.BaseStatsFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListBaseStats)
+	fc.Result = res
+	return ec.marshalOListBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListBaseStats(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_baseStatsByFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListBaseStats_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListBaseStats_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListBaseStats", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_baseStatsByFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_baseStatsByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_baseStatsByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().BaseStatsByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.BaseStatsFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.BaseStats)
+	fc.Result = res
+	return ec.marshalOBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStats(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_baseStatsByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_BaseStats_iD(ctx, field)
+			case "fkPokemon":
+				return ec.fieldContext_BaseStats_fkPokemon(ctx, field)
+			case "bHp":
+				return ec.fieldContext_BaseStats_bHp(ctx, field)
+			case "bAtk":
+				return ec.fieldContext_BaseStats_bAtk(ctx, field)
+			case "bDef":
+				return ec.fieldContext_BaseStats_bDef(ctx, field)
+			case "bSpAtk":
+				return ec.fieldContext_BaseStats_bSpAtk(ctx, field)
+			case "bSpDef":
+				return ec.fieldContext_BaseStats_bSpDef(ctx, field)
+			case "bSpeed":
+				return ec.fieldContext_BaseStats_bSpeed(ctx, field)
+			case "active":
+				return ec.fieldContext_BaseStats_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_BaseStats_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_BaseStats_updatedAt(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_BaseStats_pokemonThroughFkPokemon(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BaseStats", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_baseStatsByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6417,6 +11442,1153 @@ func (ec *executionContext) fieldContext_Query_findAllPokemon(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_findAllPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.PokemonFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Pokemon)
+	fc.Result = res
+	return ec.marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Pokemon_iD(ctx, field)
+			case "pokemonName":
+				return ec.fieldContext_Pokemon_pokemonName(ctx, field)
+			case "pokemonHeight":
+				return ec.fieldContext_Pokemon_pokemonHeight(ctx, field)
+			case "pokemonWeight":
+				return ec.fieldContext_Pokemon_pokemonWeight(ctx, field)
+			case "pokemonBaseExperience":
+				return ec.fieldContext_Pokemon_pokemonBaseExperience(ctx, field)
+			case "active":
+				return ec.fieldContext_Pokemon_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Pokemon_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Pokemon_updatedAt(ctx, field)
+			case "baseStatsThroughFkPokemon":
+				return ec.fieldContext_Pokemon_baseStatsThroughFkPokemon(ctx, field)
+			case "pokemonAbilitiesThroughFkPokemon":
+				return ec.fieldContext_Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field)
+			case "pokemonEvolutionMatchupThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field)
+			case "pokemonTypesThroughPokemonID":
+				return ec.fieldContext_Pokemon_pokemonTypesThroughPokemonID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Pokemon", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonByPokemonName(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonByPokemonName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonByPokemonName(rctx, fc.Args["pokemonName"].(string), fc.Args["filter"].(*table.PokemonFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemon)
+	fc.Result = res
+	return ec.marshalOListPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemon(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonByPokemonName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemon_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemon_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemon", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonByPokemonName_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_findAllPokemonAbilities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_findAllPokemonAbilities(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindAllPokemonAbilities(rctx, fc.Args["filter"].(*table.PokemonAbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonAbilities)
+	fc.Result = res
+	return ec.marshalNListPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_findAllPokemonAbilities(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonAbilities_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonAbilities_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_findAllPokemonAbilities_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonAbilitiesByFkPokemon(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonAbilitiesByFkPokemon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonAbilitiesByFkPokemon(rctx, fc.Args["fkPokemon"].(int), fc.Args["filter"].(*table.PokemonAbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonAbilities)
+	fc.Result = res
+	return ec.marshalOListPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonAbilitiesByFkPokemon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonAbilities_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonAbilities_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonAbilitiesByFkPokemon_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonAbilitiesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonAbilitiesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonAbilitiesByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.PokemonAbilitiesFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonAbilities)
+	fc.Result = res
+	return ec.marshalOPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonAbilitiesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonAbilities_iD(ctx, field)
+			case "fkPokemon":
+				return ec.fieldContext_PokemonAbilities_fkPokemon(ctx, field)
+			case "fkAbility":
+				return ec.fieldContext_PokemonAbilities_fkAbility(ctx, field)
+			case "isHidden":
+				return ec.fieldContext_PokemonAbilities_isHidden(ctx, field)
+			case "slot":
+				return ec.fieldContext_PokemonAbilities_slot(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonAbilities_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonAbilities_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonAbilities_updatedAt(ctx, field)
+			case "pokemonThroughFkPokemon":
+				return ec.fieldContext_PokemonAbilities_pokemonThroughFkPokemon(ctx, field)
+			case "abilitiesThroughFkAbility":
+				return ec.fieldContext_PokemonAbilities_abilitiesThroughFkAbility(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonAbilitiesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonAbilitiesByFkAbility(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonAbilitiesByFkAbility(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonAbilitiesByFkAbility(rctx, fc.Args["fkAbility"].(int), fc.Args["filter"].(*table.PokemonAbilitiesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonAbilities)
+	fc.Result = res
+	return ec.marshalOListPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonAbilities(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonAbilitiesByFkAbility(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonAbilities_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonAbilities_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonAbilities", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonAbilitiesByFkAbility_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_findAllPokemonEvolution(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_findAllPokemonEvolution(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindAllPokemonEvolution(rctx, fc.Args["filter"].(*table.PokemonEvolutionFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonEvolution)
+	fc.Result = res
+	return ec.marshalNListPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolution(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_findAllPokemonEvolution(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonEvolution_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonEvolution_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonEvolution", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_findAllPokemonEvolution_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonEvolutionByEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonEvolutionByEvolvedSpeciesID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonEvolutionByEvolvedSpeciesID(rctx, fc.Args["evolvedSpeciesID"].(int), fc.Args["filter"].(*table.PokemonEvolutionFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonEvolution)
+	fc.Result = res
+	return ec.marshalOListPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolution(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonEvolutionByEvolvedSpeciesID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonEvolution_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonEvolution_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonEvolution", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonEvolutionByEvolvedSpeciesID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonEvolutionByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonEvolutionByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonEvolutionByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.PokemonEvolutionFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonEvolution)
+	fc.Result = res
+	return ec.marshalOPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolution(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonEvolutionByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonEvolution_iD(ctx, field)
+			case "evolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolution_evolvedSpeciesID(ctx, field)
+			case "evolMinimumLevel":
+				return ec.fieldContext_PokemonEvolution_evolMinimumLevel(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonEvolution_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonEvolution_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonEvolution_updatedAt(ctx, field)
+			case "pokemonEvolutionMatchupThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolution", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonEvolutionByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_findAllPokemonEvolutionMatchup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_findAllPokemonEvolutionMatchup(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindAllPokemonEvolutionMatchup(rctx, fc.Args["filter"].(*table.PokemonEvolutionMatchupFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonEvolutionMatchup)
+	fc.Result = res
+	return ec.marshalNListPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolutionMatchup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_findAllPokemonEvolutionMatchup(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonEvolutionMatchup_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonEvolutionMatchup_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonEvolutionMatchup", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_findAllPokemonEvolutionMatchup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonEvolutionMatchupByPokemonID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonEvolutionMatchupByPokemonID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonEvolutionMatchupByPokemonID(rctx, fc.Args["pokemonID"].(int), fc.Args["filter"].(*table.PokemonEvolutionMatchupFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonEvolutionMatchup)
+	fc.Result = res
+	return ec.marshalOListPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolutionMatchup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonEvolutionMatchupByPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonEvolutionMatchup_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonEvolutionMatchup_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonEvolutionMatchup", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonEvolutionMatchupByPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonEvolutionMatchupByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonEvolutionMatchupByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonEvolutionMatchupByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.PokemonEvolutionMatchupFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonEvolutionMatchup)
+	fc.Result = res
+	return ec.marshalOPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonEvolutionMatchupByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonEvolutionMatchup_iD(ctx, field)
+			case "pokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonID(ctx, field)
+			case "evolvesFromSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_evolvesFromSpeciesID(ctx, field)
+			case "habitat":
+				return ec.fieldContext_PokemonEvolutionMatchup_habitat(ctx, field)
+			case "genderRate":
+				return ec.fieldContext_PokemonEvolutionMatchup_genderRate(ctx, field)
+			case "captureRate":
+				return ec.fieldContext_PokemonEvolutionMatchup_captureRate(ctx, field)
+			case "baseHappiness":
+				return ec.fieldContext_PokemonEvolutionMatchup_baseHappiness(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonEvolutionMatchup_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonEvolutionMatchup_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonEvolutionMatchup_updatedAt(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx, field)
+			case "pokemonEvolutionThroughEvolvedSpeciesID":
+				return ec.fieldContext_PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonEvolutionMatchup", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonEvolutionMatchupByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_findAllPokemonTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_findAllPokemonTypes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindAllPokemonTypes(rctx, fc.Args["filter"].(*table.PokemonTypesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonTypes)
+	fc.Result = res
+	return ec.marshalNListPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_findAllPokemonTypes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonTypes_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonTypes_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonTypes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_findAllPokemonTypes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonTypesByPokemonID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonTypesByPokemonID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonTypesByPokemonID(rctx, fc.Args["pokemonID"].(int), fc.Args["filter"].(*table.PokemonTypesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonTypes)
+	fc.Result = res
+	return ec.marshalOListPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonTypesByPokemonID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonTypes_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonTypes_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonTypes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonTypesByPokemonID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonTypesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonTypesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonTypesByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.PokemonTypesFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.PokemonTypes)
+	fc.Result = res
+	return ec.marshalOPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonTypesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_PokemonTypes_iD(ctx, field)
+			case "pokemonID":
+				return ec.fieldContext_PokemonTypes_pokemonID(ctx, field)
+			case "typeID":
+				return ec.fieldContext_PokemonTypes_typeID(ctx, field)
+			case "slot":
+				return ec.fieldContext_PokemonTypes_slot(ctx, field)
+			case "active":
+				return ec.fieldContext_PokemonTypes_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PokemonTypes_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PokemonTypes_updatedAt(ctx, field)
+			case "pokemonThroughPokemonID":
+				return ec.fieldContext_PokemonTypes_pokemonThroughPokemonID(ctx, field)
+			case "typesThroughTypeID":
+				return ec.fieldContext_PokemonTypes_typesThroughTypeID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PokemonTypes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonTypesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pokemonTypesByTypeID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pokemonTypesByTypeID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PokemonTypesByTypeID(rctx, fc.Args["typeID"].(int), fc.Args["filter"].(*table.PokemonTypesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListPokemonTypes)
+	fc.Result = res
+	return ec.marshalOListPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pokemonTypesByTypeID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListPokemonTypes_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListPokemonTypes_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListPokemonTypes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pokemonTypesByTypeID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_findAllTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_findAllTypes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindAllTypes(rctx, fc.Args["filter"].(*table.TypesFilter), fc.Args["pagination"].(*internal.Pagination))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*table.ListTypes)
+	fc.Result = res
+	return ec.marshalNListTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_findAllTypes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ListTypes_totalCount(ctx, field)
+			case "data":
+				return ec.fieldContext_ListTypes_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ListTypes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_findAllTypes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_typesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_typesByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TypesByID(rctx, fc.Args["iD"].(int), fc.Args["filter"].(*table.TypesFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*table.Types)
+	fc.Result = res
+	return ec.marshalOTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_typesByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "iD":
+				return ec.fieldContext_Types_iD(ctx, field)
+			case "typeName":
+				return ec.fieldContext_Types_typeName(ctx, field)
+			case "active":
+				return ec.fieldContext_Types_active(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Types_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Types_updatedAt(ctx, field)
+			case "pokemonTypesThroughTypeID":
+				return ec.fieldContext_Types_pokemonTypesThroughTypeID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Types", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_typesByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6768,8 +12940,8 @@ func (ec *executionContext) fieldContext_Types_updatedAt(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Types_pokemonTypesByTypeID(ctx context.Context, field graphql.CollectedField, obj *table.Types) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Types_pokemonTypesByTypeID(ctx, field)
+func (ec *executionContext) _Types_pokemonTypesThroughTypeID(ctx context.Context, field graphql.CollectedField, obj *table.Types) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Types_pokemonTypesThroughTypeID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6782,7 +12954,7 @@ func (ec *executionContext) _Types_pokemonTypesByTypeID(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Types().PokemonTypesByTypeID(rctx, obj, fc.Args["filter"].(*table.PokemonTypesFilter), fc.Args["pagination"].(*internal.Pagination))
+		return ec.resolvers.Types().PokemonTypesThroughTypeID(rctx, obj, fc.Args["filter"].(*table.PokemonTypesFilter), fc.Args["pagination"].(*internal.Pagination))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6799,7 +12971,7 @@ func (ec *executionContext) _Types_pokemonTypesByTypeID(ctx context.Context, fie
 	return ec.marshalNListPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonTypes(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Types_pokemonTypesByTypeID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Types_pokemonTypesThroughTypeID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Types",
 		Field:      field,
@@ -6822,7 +12994,7 @@ func (ec *executionContext) fieldContext_Types_pokemonTypesByTypeID(ctx context.
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Types_pokemonTypesByTypeID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Types_pokemonTypesThroughTypeID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -10207,7 +16379,7 @@ func (ec *executionContext) _Abilities(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._Abilities_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._Abilities_updatedAt(ctx, field, obj)
-		case "pokemonAbilitiesByFkAbility":
+		case "pokemonAbilitiesThroughFkAbility":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10216,7 +16388,7 @@ func (ec *executionContext) _Abilities(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Abilities_pokemonAbilitiesByFkAbility(ctx, field, obj)
+				res = ec._Abilities_pokemonAbilitiesThroughFkAbility(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10308,7 +16480,7 @@ func (ec *executionContext) _BaseStats(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._BaseStats_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._BaseStats_updatedAt(ctx, field, obj)
-		case "pokemonByFkPokemon":
+		case "pokemonThroughFkPokemon":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10317,7 +16489,7 @@ func (ec *executionContext) _BaseStats(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._BaseStats_pokemonByFkPokemon(ctx, field, obj)
+				res = ec._BaseStats_pokemonThroughFkPokemon(ctx, field, obj)
 				return res
 			}
 
@@ -10716,6 +16888,168 @@ func (ec *executionContext) _ListTypes(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "insertAbilities":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertAbilities(ctx, field)
+			})
+		case "updateAbilitiesByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateAbilitiesByFields(ctx, field)
+			})
+		case "deleteAbilitiesByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteAbilitiesByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertBaseStats":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertBaseStats(ctx, field)
+			})
+		case "updateBaseStatsByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateBaseStatsByFields(ctx, field)
+			})
+		case "deleteBaseStatsByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteBaseStatsByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertPokemon":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertPokemon(ctx, field)
+			})
+		case "updatePokemonByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePokemonByFields(ctx, field)
+			})
+		case "deletePokemonByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePokemonByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertPokemonAbilities":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertPokemonAbilities(ctx, field)
+			})
+		case "updatePokemonAbilitiesByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePokemonAbilitiesByFields(ctx, field)
+			})
+		case "deletePokemonAbilitiesByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePokemonAbilitiesByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertPokemonEvolution":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertPokemonEvolution(ctx, field)
+			})
+		case "updatePokemonEvolutionByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePokemonEvolutionByFields(ctx, field)
+			})
+		case "deletePokemonEvolutionByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePokemonEvolutionByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertPokemonEvolutionMatchup":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertPokemonEvolutionMatchup(ctx, field)
+			})
+		case "updatePokemonEvolutionMatchupByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePokemonEvolutionMatchupByFields(ctx, field)
+			})
+		case "deletePokemonEvolutionMatchupByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePokemonEvolutionMatchupByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertPokemonTypes":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertPokemonTypes(ctx, field)
+			})
+		case "updatePokemonTypesByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePokemonTypesByFields(ctx, field)
+			})
+		case "deletePokemonTypesByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePokemonTypesByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertTypes":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertTypes(ctx, field)
+			})
+		case "updateTypesByFields":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTypesByFields(ctx, field)
+			})
+		case "deleteTypesByID":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTypesByID(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var pokemonImplementors = []string{"Pokemon"}
 
 func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, obj *table.Pokemon) graphql.Marshaler {
@@ -10752,7 +17086,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Pokemon_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._Pokemon_updatedAt(ctx, field, obj)
-		case "baseStatsByFkPokemon":
+		case "baseStatsThroughFkPokemon":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10761,7 +17095,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Pokemon_baseStatsByFkPokemon(ctx, field, obj)
+				res = ec._Pokemon_baseStatsThroughFkPokemon(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10788,7 +17122,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "pokemonAbilitiesByFkPokemon":
+		case "pokemonAbilitiesThroughFkPokemon":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10797,7 +17131,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Pokemon_pokemonAbilitiesByFkPokemon(ctx, field, obj)
+				res = ec._Pokemon_pokemonAbilitiesThroughFkPokemon(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10824,7 +17158,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "pokemonEvolutionMatchupByPokemonID":
+		case "pokemonEvolutionMatchupThroughPokemonID":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10833,7 +17167,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Pokemon_pokemonEvolutionMatchupByPokemonID(ctx, field, obj)
+				res = ec._Pokemon_pokemonEvolutionMatchupThroughPokemonID(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10860,7 +17194,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "pokemonTypesByPokemonID":
+		case "pokemonTypesThroughPokemonID":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10869,7 +17203,7 @@ func (ec *executionContext) _Pokemon(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Pokemon_pokemonTypesByPokemonID(ctx, field, obj)
+				res = ec._Pokemon_pokemonTypesThroughPokemonID(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10964,7 +17298,7 @@ func (ec *executionContext) _PokemonAbilities(ctx context.Context, sel ast.Selec
 			out.Values[i] = ec._PokemonAbilities_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._PokemonAbilities_updatedAt(ctx, field, obj)
-		case "pokemonByFkPokemon":
+		case "pokemonThroughFkPokemon":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10973,7 +17307,7 @@ func (ec *executionContext) _PokemonAbilities(ctx context.Context, sel ast.Selec
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._PokemonAbilities_pokemonByFkPokemon(ctx, field, obj)
+				res = ec._PokemonAbilities_pokemonThroughFkPokemon(ctx, field, obj)
 				return res
 			}
 
@@ -10997,7 +17331,7 @@ func (ec *executionContext) _PokemonAbilities(ctx context.Context, sel ast.Selec
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "abilitiesByFkAbility":
+		case "abilitiesThroughFkAbility":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11006,7 +17340,7 @@ func (ec *executionContext) _PokemonAbilities(ctx context.Context, sel ast.Selec
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._PokemonAbilities_abilitiesByFkAbility(ctx, field, obj)
+				res = ec._PokemonAbilities_abilitiesThroughFkAbility(ctx, field, obj)
 				return res
 			}
 
@@ -11085,7 +17419,7 @@ func (ec *executionContext) _PokemonEvolution(ctx context.Context, sel ast.Selec
 			out.Values[i] = ec._PokemonEvolution_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._PokemonEvolution_updatedAt(ctx, field, obj)
-		case "pokemonEvolutionMatchupByEvolvedSpeciesID":
+		case "pokemonEvolutionMatchupThroughEvolvedSpeciesID":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11094,7 +17428,7 @@ func (ec *executionContext) _PokemonEvolution(ctx context.Context, sel ast.Selec
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._PokemonEvolution_pokemonEvolutionMatchupByEvolvedSpeciesID(ctx, field, obj)
+				res = ec._PokemonEvolution_pokemonEvolutionMatchupThroughEvolvedSpeciesID(ctx, field, obj)
 				return res
 			}
 
@@ -11190,7 +17524,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup(ctx context.Context, sel as
 			out.Values[i] = ec._PokemonEvolutionMatchup_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._PokemonEvolutionMatchup_updatedAt(ctx, field, obj)
-		case "pokemonByPokemonID":
+		case "pokemonThroughPokemonID":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11199,7 +17533,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup(ctx context.Context, sel as
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._PokemonEvolutionMatchup_pokemonByPokemonID(ctx, field, obj)
+				res = ec._PokemonEvolutionMatchup_pokemonThroughPokemonID(ctx, field, obj)
 				return res
 			}
 
@@ -11223,7 +17557,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup(ctx context.Context, sel as
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "pokemonEvolutionByEvolvedSpeciesID":
+		case "pokemonEvolutionThroughEvolvedSpeciesID":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11232,7 +17566,7 @@ func (ec *executionContext) _PokemonEvolutionMatchup(ctx context.Context, sel as
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._PokemonEvolutionMatchup_pokemonEvolutionByEvolvedSpeciesID(ctx, field, obj)
+				res = ec._PokemonEvolutionMatchup_pokemonEvolutionThroughEvolvedSpeciesID(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -11322,7 +17656,7 @@ func (ec *executionContext) _PokemonTypes(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._PokemonTypes_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._PokemonTypes_updatedAt(ctx, field, obj)
-		case "pokemonByPokemonID":
+		case "pokemonThroughPokemonID":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11331,7 +17665,7 @@ func (ec *executionContext) _PokemonTypes(ctx context.Context, sel ast.Selection
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._PokemonTypes_pokemonByPokemonID(ctx, field, obj)
+				res = ec._PokemonTypes_pokemonThroughPokemonID(ctx, field, obj)
 				return res
 			}
 
@@ -11355,7 +17689,7 @@ func (ec *executionContext) _PokemonTypes(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "typesByTypeID":
+		case "typesThroughTypeID":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11364,7 +17698,7 @@ func (ec *executionContext) _PokemonTypes(ctx context.Context, sel ast.Selection
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._PokemonTypes_typesByTypeID(ctx, field, obj)
+				res = ec._PokemonTypes_typesThroughTypeID(ctx, field, obj)
 				return res
 			}
 
@@ -11430,6 +17764,126 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "findAllAbilities":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findAllAbilities(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "abilitiesByAbilityName":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_abilitiesByAbilityName(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "abilitiesByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_abilitiesByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findAllBaseStats":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findAllBaseStats(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "baseStatsByFkPokemon":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_baseStatsByFkPokemon(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "baseStatsByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_baseStatsByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "findAllPokemon":
 			field := field
 
@@ -11443,6 +17897,363 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonByPokemonName":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonByPokemonName(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findAllPokemonAbilities":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findAllPokemonAbilities(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonAbilitiesByFkPokemon":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonAbilitiesByFkPokemon(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonAbilitiesByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonAbilitiesByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonAbilitiesByFkAbility":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonAbilitiesByFkAbility(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findAllPokemonEvolution":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findAllPokemonEvolution(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonEvolutionByEvolvedSpeciesID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonEvolutionByEvolvedSpeciesID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonEvolutionByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonEvolutionByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findAllPokemonEvolutionMatchup":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findAllPokemonEvolutionMatchup(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonEvolutionMatchupByPokemonID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonEvolutionMatchupByPokemonID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonEvolutionMatchupByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonEvolutionMatchupByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findAllPokemonTypes":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findAllPokemonTypes(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonTypesByPokemonID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonTypesByPokemonID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonTypesByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonTypesByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pokemonTypesByTypeID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pokemonTypesByTypeID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findAllTypes":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_findAllTypes(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "typesByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_typesByID(ctx, field)
 				return res
 			}
 
@@ -11513,7 +18324,7 @@ func (ec *executionContext) _Types(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Types_createdAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._Types_updatedAt(ctx, field, obj)
-		case "pokemonTypesByTypeID":
+		case "pokemonTypesThroughTypeID":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11522,7 +18333,7 @@ func (ec *executionContext) _Types(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Types_pokemonTypesByTypeID(ctx, field, obj)
+				res = ec._Types_pokemonTypesThroughTypeID(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -11955,6 +18766,16 @@ func (ec *executionContext) marshalNAbilities2ᚕgithubᚗcomᚋketanᚑ10ᚋsql
 	return ret
 }
 
+func (ec *executionContext) unmarshalNAbilitiesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilitiesCreate(ctx context.Context, v any) (table.AbilitiesCreate, error) {
+	res, err := ec.unmarshalInputAbilitiesCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAbilitiesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐAbilitiesUpdate(ctx context.Context, v any) (table.AbilitiesUpdate, error) {
+	res, err := ec.unmarshalInputAbilitiesUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNBaseStats2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStats(ctx context.Context, sel ast.SelectionSet, v table.BaseStats) graphql.Marshaler {
 	return ec._BaseStats(ctx, sel, &v)
 }
@@ -12003,6 +18824,16 @@ func (ec *executionContext) marshalNBaseStats2ᚕgithubᚗcomᚋketanᚑ10ᚋsql
 	return ret
 }
 
+func (ec *executionContext) unmarshalNBaseStatsCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsCreate(ctx context.Context, v any) (table.BaseStatsCreate, error) {
+	res, err := ec.unmarshalInputBaseStatsCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNBaseStatsUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsUpdate(ctx context.Context, v any) (table.BaseStatsUpdate, error) {
+	res, err := ec.unmarshalInputBaseStatsUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -12033,6 +18864,20 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNListAbilities2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListAbilities(ctx context.Context, sel ast.SelectionSet, v table.ListAbilities) graphql.Marshaler {
+	return ec._ListAbilities(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNListAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListAbilities(ctx context.Context, sel ast.SelectionSet, v *table.ListAbilities) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ListAbilities(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNListBaseStats2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListBaseStats(ctx context.Context, sel ast.SelectionSet, v table.ListBaseStats) graphql.Marshaler {
@@ -12117,6 +18962,20 @@ func (ec *executionContext) marshalNListPokemonTypes2ᚖgithubᚗcomᚋketanᚑ1
 		return graphql.Null
 	}
 	return ec._ListPokemonTypes(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNListTypes2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListTypes(ctx context.Context, sel ast.SelectionSet, v table.ListTypes) graphql.Marshaler {
+	return ec._ListTypes(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNListTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListTypes(ctx context.Context, sel ast.SelectionSet, v *table.ListTypes) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ListTypes(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPokemon2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemon(ctx context.Context, sel ast.SelectionSet, v table.Pokemon) graphql.Marshaler {
@@ -12215,6 +19074,21 @@ func (ec *executionContext) marshalNPokemonAbilities2ᚕgithubᚗcomᚋketanᚑ1
 	return ret
 }
 
+func (ec *executionContext) unmarshalNPokemonAbilitiesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesCreate(ctx context.Context, v any) (table.PokemonAbilitiesCreate, error) {
+	res, err := ec.unmarshalInputPokemonAbilitiesCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPokemonAbilitiesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesUpdate(ctx context.Context, v any) (table.PokemonAbilitiesUpdate, error) {
+	res, err := ec.unmarshalInputPokemonAbilitiesUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPokemonCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonCreate(ctx context.Context, v any) (table.PokemonCreate, error) {
+	res, err := ec.unmarshalInputPokemonCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNPokemonEvolution2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolution(ctx context.Context, sel ast.SelectionSet, v table.PokemonEvolution) graphql.Marshaler {
 	return ec._PokemonEvolution(ctx, sel, &v)
 }
@@ -12261,6 +19135,11 @@ func (ec *executionContext) marshalNPokemonEvolution2ᚕgithubᚗcomᚋketanᚑ1
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalNPokemonEvolutionCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionCreate(ctx context.Context, v any) (table.PokemonEvolutionCreate, error) {
+	res, err := ec.unmarshalInputPokemonEvolutionCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPokemonEvolutionMatchup2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchup(ctx context.Context, sel ast.SelectionSet, v table.PokemonEvolutionMatchup) graphql.Marshaler {
@@ -12311,6 +19190,21 @@ func (ec *executionContext) marshalNPokemonEvolutionMatchup2ᚕgithubᚗcomᚋke
 	return ret
 }
 
+func (ec *executionContext) unmarshalNPokemonEvolutionMatchupCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupCreate(ctx context.Context, v any) (table.PokemonEvolutionMatchupCreate, error) {
+	res, err := ec.unmarshalInputPokemonEvolutionMatchupCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPokemonEvolutionMatchupUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionMatchupUpdate(ctx context.Context, v any) (table.PokemonEvolutionMatchupUpdate, error) {
+	res, err := ec.unmarshalInputPokemonEvolutionMatchupUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPokemonEvolutionUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionUpdate(ctx context.Context, v any) (table.PokemonEvolutionUpdate, error) {
+	res, err := ec.unmarshalInputPokemonEvolutionUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNPokemonTypes2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypes(ctx context.Context, sel ast.SelectionSet, v table.PokemonTypes) graphql.Marshaler {
 	return ec._PokemonTypes(ctx, sel, &v)
 }
@@ -12357,6 +19251,21 @@ func (ec *executionContext) marshalNPokemonTypes2ᚕgithubᚗcomᚋketanᚑ10ᚋ
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalNPokemonTypesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesCreate(ctx context.Context, v any) (table.PokemonTypesCreate, error) {
+	res, err := ec.unmarshalInputPokemonTypesCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPokemonTypesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesUpdate(ctx context.Context, v any) (table.PokemonTypesUpdate, error) {
+	res, err := ec.unmarshalInputPokemonTypesUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPokemonUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonUpdate(ctx context.Context, v any) (table.PokemonUpdate, error) {
+	res, err := ec.unmarshalInputPokemonUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
@@ -12421,6 +19330,16 @@ func (ec *executionContext) marshalNTypes2ᚕgithubᚗcomᚋketanᚑ10ᚋsql2gql
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalNTypesCreate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesCreate(ctx context.Context, v any) (table.TypesCreate, error) {
+	res, err := ec.unmarshalInputTypesCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNTypesUpdate2githubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐTypesUpdate(ctx context.Context, v any) (table.TypesUpdate, error) {
+	res, err := ec.unmarshalInputTypesUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -12691,6 +19610,13 @@ func (ec *executionContext) unmarshalOAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStats(ctx context.Context, sel ast.SelectionSet, v *table.BaseStats) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._BaseStats(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOBaseStatsFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐBaseStatsFilter(ctx context.Context, v any) (*table.BaseStatsFilter, error) {
 	if v == nil {
 		return nil, nil
@@ -12763,6 +19689,55 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
+func (ec *executionContext) marshalOListAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListAbilities(ctx context.Context, sel ast.SelectionSet, v *table.ListAbilities) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ListAbilities(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOListBaseStats2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListBaseStats(ctx context.Context, sel ast.SelectionSet, v *table.ListBaseStats) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ListBaseStats(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOListPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemon(ctx context.Context, sel ast.SelectionSet, v *table.ListPokemon) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ListPokemon(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOListPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonAbilities(ctx context.Context, sel ast.SelectionSet, v *table.ListPokemonAbilities) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ListPokemonAbilities(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOListPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolution(ctx context.Context, sel ast.SelectionSet, v *table.ListPokemonEvolution) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ListPokemonEvolution(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOListPokemonEvolutionMatchup2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonEvolutionMatchup(ctx context.Context, sel ast.SelectionSet, v *table.ListPokemonEvolutionMatchup) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ListPokemonEvolutionMatchup(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOListPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐListPokemonTypes(ctx context.Context, sel ast.SelectionSet, v *table.ListPokemonTypes) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ListPokemonTypes(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalONullInt642databaseᚋsqlᚐNullInt64(ctx context.Context, v any) (sql.NullInt64, error) {
 	res, err := internal.UnmarshalNullInt64(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -12820,12 +19795,26 @@ func (ec *executionContext) marshalOPokemon2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2g
 	return ec._Pokemon(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOPokemonAbilities2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilities(ctx context.Context, sel ast.SelectionSet, v *table.PokemonAbilities) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PokemonAbilities(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOPokemonAbilitiesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonAbilitiesFilter(ctx context.Context, v any) (*table.PokemonAbilitiesFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputPokemonAbilitiesFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPokemonEvolution2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolution(ctx context.Context, sel ast.SelectionSet, v *table.PokemonEvolution) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PokemonEvolution(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOPokemonEvolutionFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonEvolutionFilter(ctx context.Context, v any) (*table.PokemonEvolutionFilter, error) {
@@ -12873,6 +19862,13 @@ func (ec *executionContext) unmarshalOPokemonFilter2ᚖgithubᚗcomᚋketanᚑ10
 	}
 	res, err := ec.unmarshalInputPokemonFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPokemonTypes2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypes(ctx context.Context, sel ast.SelectionSet, v *table.PokemonTypes) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PokemonTypes(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOPokemonTypesFilter2ᚖgithubᚗcomᚋketanᚑ10ᚋsql2gqlᚋexamplesᚋpokemonᚋsql2gqlᚋtableᚐPokemonTypesFilter(ctx context.Context, v any) (*table.PokemonTypesFilter, error) {

@@ -14,8 +14,8 @@ import (
 type IPokemonAbilitiesRltsRepository interface {
 
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
-	PokemonByFkPokemon(ctx context.Context, obj *table.PokemonAbilities, filter *table.PokemonFilter) (*table.Pokemon, error)
-	AbilitiesByFkAbility(ctx context.Context, obj *table.PokemonAbilities, filter *table.AbilitiesFilter) (*table.Abilities, error)
+	PokemonThroughFkPokemon(ctx context.Context, obj *table.PokemonAbilities, filter *table.PokemonFilter) (*table.Pokemon, error)
+	AbilitiesThroughFkAbility(ctx context.Context, obj *table.PokemonAbilities, filter *table.AbilitiesFilter) (*table.Abilities, error)
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
 
@@ -32,7 +32,7 @@ var NewPokemonAbilitiesRltsRepository = wire.NewSet(
 	wire.Bind(new(IPokemonAbilitiesRltsRepository), new(*PokemonAbilitiesRltsRepository)),
 )
 
-func (par *PokemonAbilitiesRltsRepository) PokemonByFkPokemon(ctx context.Context, obj *table.PokemonAbilities, filter *table.PokemonFilter) (*table.Pokemon, error) {
+func (par *PokemonAbilitiesRltsRepository) PokemonThroughFkPokemon(ctx context.Context, obj *table.PokemonAbilities, filter *table.PokemonFilter) (*table.Pokemon, error) {
 	if obj == nil {
 		return nil, nil
 	}
@@ -53,7 +53,7 @@ func (par *PokemonAbilitiesRltsRepository) PokemonByFkPokemon(ctx context.Contex
 	}
 	return &result.Data[0], nil
 }
-func (par *PokemonAbilitiesRltsRepository) AbilitiesByFkAbility(ctx context.Context, obj *table.PokemonAbilities, filter *table.AbilitiesFilter) (*table.Abilities, error) {
+func (par *PokemonAbilitiesRltsRepository) AbilitiesThroughFkAbility(ctx context.Context, obj *table.PokemonAbilities, filter *table.AbilitiesFilter) (*table.Abilities, error) {
 	if obj == nil {
 		return nil, nil
 	}

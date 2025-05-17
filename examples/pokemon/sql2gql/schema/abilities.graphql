@@ -6,13 +6,9 @@ type Abilities {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-
-
-
-    pokemonAbilitiesByFkAbility(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
-
+# ManyToOne
+# OneToMany
+    pokemonAbilitiesThroughFkAbility(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
 }
 input AbilitiesFilter {
     iD: FilterOnField

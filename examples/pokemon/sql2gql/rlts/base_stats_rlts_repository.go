@@ -14,7 +14,7 @@ import (
 type IBaseStatsRltsRepository interface {
 
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
-	PokemonByFkPokemon(ctx context.Context, obj *table.BaseStats, filter *table.PokemonFilter) (*table.Pokemon, error)
+	PokemonThroughFkPokemon(ctx context.Context, obj *table.BaseStats, filter *table.PokemonFilter) (*table.Pokemon, error)
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
 
@@ -29,7 +29,7 @@ var NewBaseStatsRltsRepository = wire.NewSet(
 	wire.Bind(new(IBaseStatsRltsRepository), new(*BaseStatsRltsRepository)),
 )
 
-func (bsr *BaseStatsRltsRepository) PokemonByFkPokemon(ctx context.Context, obj *table.BaseStats, filter *table.PokemonFilter) (*table.Pokemon, error) {
+func (bsr *BaseStatsRltsRepository) PokemonThroughFkPokemon(ctx context.Context, obj *table.BaseStats, filter *table.PokemonFilter) (*table.Pokemon, error) {
 	if obj == nil {
 		return nil, nil
 	}

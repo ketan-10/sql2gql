@@ -37,11 +37,11 @@ type I{{ $tableNameCamel }}Repository interface {
         {{- if .IsUnique }}
         {{ $tableNameCamel }}By{{range .Columns}}{{camelCase .ColumnName}}{{end}}(ctx context.Context, 
             {{- range .Columns }} {{ camelCaseVar .ColumnName }} {{ .Column.GoType }},{{- end -}}
-        filter *table.{{ $tableNameCamel }}Filter) (table.{{ $tableNameCamel }}, error)
+        filter *table.{{ $tableNameCamel }}Filter) (*table.{{ $tableNameCamel }}, error)
         
         {{ $tableNameCamel }}By{{range .Columns}}{{camelCase .ColumnName}}{{end}}WithSuffix(ctx context.Context, 
             {{- range .Columns }} {{ camelCaseVar .ColumnName }} {{ .Column.GoType }},{{- end -}}
-        filter *table.{{ $tableNameCamel }}Filter, suffixes ...sq.Sqlizer) (table.{{ $tableNameCamel }}, error)
+        filter *table.{{ $tableNameCamel }}Filter, suffixes ...sq.Sqlizer) (*table.{{ $tableNameCamel }}, error)
         
         {{- else }}
 
@@ -333,20 +333,20 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) FindAll{{ $tableNameCa
     {{- if .IsUnique }}
     func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) {{ $tableNameCamel }}By{{range .Columns}}{{camelCase .ColumnName}}{{end}}(ctx context.Context, 
         {{- range .Columns }} {{ camelCaseVar .ColumnName }} {{ .Column.GoType }},{{- end -}}
-    filter *table.{{ $tableNameCamel }}Filter) (table.{{ $tableNameCamel }}, error) {
+    filter *table.{{ $tableNameCamel }}Filter) (*table.{{ $tableNameCamel }}, error) {
         return {{ $shortName }}r.{{ $tableNameCamel }}By{{range .Columns}}{{camelCase .ColumnName}}{{end}}WithSuffix(ctx, 
         {{- range .Columns }} {{ camelCaseVar .ColumnName }},{{- end -}} filter)
     }
 
     func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) {{ $tableNameCamel }}By{{range .Columns}}{{camelCase .ColumnName}}{{end}}WithSuffix(ctx context.Context, 
         {{- range .Columns }} {{ camelCaseVar .ColumnName }} {{ .Column.GoType }},{{- end -}}
-    filter *table.{{ $tableNameCamel }}Filter, suffixes ...sq.Sqlizer) (table.{{ $tableNameCamel }}, error) {
+    filter *table.{{ $tableNameCamel }}Filter, suffixes ...sq.Sqlizer) (*table.{{ $tableNameCamel }}, error) {
         var err error
 
         // sql query
         qb, err := {{ $shortName }}r.FindAll{{ $tableNameCamel }}BaseQuery(ctx, filter, "`{{ $.Table.TableName }}`.*", suffixes...)
         if err != nil {
-            return table.{{ $tableNameCamel }}{}, err
+            return &table.{{ $tableNameCamel }}{}, err
         }
         {{- range .Columns }}
             qb = qb.Where(sq.Eq{"`{{ $.Table.TableName }}`.`{{ .ColumnName }}`": {{ camelCaseVar .ColumnName }}})
@@ -356,9 +356,9 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) FindAll{{ $tableNameCa
         {{ $shortName }} := table.{{ $tableNameCamel }}{}
         err = {{ $shortName }}r.DB.Get(ctx, &{{ $shortName }}, qb)
         if err != nil {
-            return table.{{ $tableNameCamel }}{}, err
+            return &table.{{ $tableNameCamel }}{}, err
         }
-        return {{ $shortName }}, nil
+        return &{{ $shortName }}, nil
     }
     
     {{- else }}

@@ -12,13 +12,9 @@ type BaseStats {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByFkPokemon(filter: PokemonFilter): Pokemon
-
-
-
-
+# ManyToOne
+    pokemonThroughFkPokemon(filter: PokemonFilter): Pokemon
+# OneToMany
 }
 input BaseStatsFilter {
     iD: FilterOnField

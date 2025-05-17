@@ -9,16 +9,12 @@ type Pokemon {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-
-
-
-    baseStatsByFkPokemon(filter: BaseStatsFilter, pagination: Pagination): ListBaseStats!
-    pokemonAbilitiesByFkPokemon(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
-    pokemonEvolutionMatchupByPokemonID(filter: PokemonEvolutionMatchupFilter, pagination: Pagination): ListPokemonEvolutionMatchup!
-    pokemonTypesByPokemonID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
-
+# ManyToOne
+# OneToMany
+    baseStatsThroughFkPokemon(filter: BaseStatsFilter, pagination: Pagination): ListBaseStats!
+    pokemonAbilitiesThroughFkPokemon(filter: PokemonAbilitiesFilter, pagination: Pagination): ListPokemonAbilities!
+    pokemonEvolutionMatchupThroughPokemonID(filter: PokemonEvolutionMatchupFilter, pagination: Pagination): ListPokemonEvolutionMatchup!
+    pokemonTypesThroughPokemonID(filter: PokemonTypesFilter, pagination: Pagination): ListPokemonTypes!
 }
 input PokemonFilter {
     iD: FilterOnField

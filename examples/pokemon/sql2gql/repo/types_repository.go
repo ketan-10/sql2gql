@@ -26,9 +26,9 @@ type ITypesRepository interface {
 
 	FindAllTypes(ctx context.Context, t *table.TypesFilter, pagination *internal.Pagination) (*table.ListTypes, error)
 	FindAllTypesWithSuffix(ctx context.Context, t *table.TypesFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListTypes, error)
-	TypesByID(ctx context.Context, iD int, filter *table.TypesFilter) (table.Types, error)
+	TypesByID(ctx context.Context, iD int, filter *table.TypesFilter) (*table.Types, error)
 
-	TypesByIDWithSuffix(ctx context.Context, iD int, filter *table.TypesFilter, suffixes ...sq.Sqlizer) (table.Types, error)
+	TypesByIDWithSuffix(ctx context.Context, iD int, filter *table.TypesFilter, suffixes ...sq.Sqlizer) (*table.Types, error)
 }
 
 type ITypesRepositoryQueryBuilder interface {
@@ -286,17 +286,17 @@ func (tr *TypesRepository) FindAllTypesWithSuffix(ctx context.Context, filter *t
 
 	return &list, err
 }
-func (tr *TypesRepository) TypesByID(ctx context.Context, iD int, filter *table.TypesFilter) (table.Types, error) {
+func (tr *TypesRepository) TypesByID(ctx context.Context, iD int, filter *table.TypesFilter) (*table.Types, error) {
 	return tr.TypesByIDWithSuffix(ctx, iD, filter)
 }
 
-func (tr *TypesRepository) TypesByIDWithSuffix(ctx context.Context, iD int, filter *table.TypesFilter, suffixes ...sq.Sqlizer) (table.Types, error) {
+func (tr *TypesRepository) TypesByIDWithSuffix(ctx context.Context, iD int, filter *table.TypesFilter, suffixes ...sq.Sqlizer) (*table.Types, error) {
 	var err error
 
 	// sql query
 	qb, err := tr.FindAllTypesBaseQuery(ctx, filter, "`types`.*", suffixes...)
 	if err != nil {
-		return table.Types{}, err
+		return &table.Types{}, err
 	}
 	qb = qb.Where(sq.Eq{"`types`.`id`": iD})
 
@@ -304,7 +304,7 @@ func (tr *TypesRepository) TypesByIDWithSuffix(ctx context.Context, iD int, filt
 	t := table.Types{}
 	err = tr.DB.Get(ctx, &t, qb)
 	if err != nil {
-		return table.Types{}, err
+		return &table.Types{}, err
 	}
-	return t, nil
+	return &t, nil
 }

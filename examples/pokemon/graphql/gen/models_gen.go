@@ -2,5 +2,8 @@
 
 package gen
 
+type Mutation struct {
+}
+
 type Query struct {
 }

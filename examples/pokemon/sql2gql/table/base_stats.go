@@ -272,13 +272,6 @@ func (l *ListBaseStats) Find(f func(item BaseStats) bool) (res BaseStats, found 
 	}
 	return BaseStats{}, false
 }
-func (l *ListBaseStats) MapByID() (m map[int]BaseStats) {
-	m = make(map[int]BaseStats, len(l.Data))
-	for _, item := range l.Data {
-		m[item.ID] = item
-	}
-	return m
-}
 
 func (l *ListBaseStats) MapByFkPokemon() (m map[int]ListBaseStats) {
 	m = make(map[int]ListBaseStats)
@@ -291,6 +284,14 @@ func (l *ListBaseStats) MapByFkPokemon() (m map[int]ListBaseStats) {
 	for k, v := range m {
 		v.TotalCount = len(v.Data)
 		m[k] = v
+	}
+	return m
+}
+
+func (l *ListBaseStats) MapByID() (m map[int]BaseStats) {
+	m = make(map[int]BaseStats, len(l.Data))
+	for _, item := range l.Data {
+		m[item.ID] = item
 	}
 	return m
 }

@@ -11,14 +11,10 @@ type PokemonEvolutionMatchup {
     active: Boolean !
     createdAt: NullTime 
     updatedAt: NullTime 
-
-
-    pokemonByPokemonID(filter: PokemonFilter): Pokemon
-
-
-
-    pokemonEvolutionByEvolvedSpeciesID(filter: PokemonEvolutionFilter, pagination: Pagination): ListPokemonEvolution!
-
+# ManyToOne
+    pokemonThroughPokemonID(filter: PokemonFilter): Pokemon
+# OneToMany
+    pokemonEvolutionThroughEvolvedSpeciesID(filter: PokemonEvolutionFilter, pagination: Pagination): ListPokemonEvolution!
 }
 input PokemonEvolutionMatchupFilter {
     iD: FilterOnField

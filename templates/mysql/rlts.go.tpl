@@ -8,12 +8,12 @@ type I{{ $tableNameCamel }}RltsRepository interface {
 
 // This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
 {{- range .ForeignKeys }}
-    {{ camelCase .RefTableName }}By{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .RefTableName }}Filter) (*table.{{ camelCase .RefTableName }}, error)
+    {{ camelCase .RefTableName }}Through{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .RefTableName }}Filter) (*table.{{ camelCase .RefTableName }}, error)
 {{- end }}
 
 //  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
 {{- range .ForeignKeysRef }}
-    {{ camelCase .Table.TableName }}By{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .Table.TableName }}Filter, pagination *internal.Pagination) (*table.List{{ camelCase .Table.TableName }}, error)
+    {{ camelCase .Table.TableName }}Through{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .Table.TableName }}Filter, pagination *internal.Pagination) (*table.List{{ camelCase .Table.TableName }}, error)
 {{- end }}
 
 }
@@ -32,7 +32,7 @@ var New{{ $tableNameCamel }}RltsRepository = wire.NewSet(
 )
 
 {{- range .ForeignKeys }}
-func ({{ $shortName }}r *{{ $tableNameCamel }}RltsRepository) {{ camelCase .RefTableName }}By{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .RefTableName }}Filter) (*table.{{ camelCase .RefTableName }}, error) {
+func ({{ $shortName }}r *{{ $tableNameCamel }}RltsRepository) {{ camelCase .RefTableName }}Through{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .RefTableName }}Filter) (*table.{{ camelCase .RefTableName }}, error) {
     if obj ==  nil {
         return nil, nil
     }
@@ -57,7 +57,7 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}RltsRepository) {{ camelCase .RefT
 
 
 {{- range .ForeignKeysRef }}
-func ({{ $shortName }}r *{{ $tableNameCamel }}RltsRepository) {{ camelCase .Table.TableName }}By{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .Table.TableName }}Filter, pagination *internal.Pagination) (*table.List{{ camelCase .Table.TableName }}, error) {
+func ({{ $shortName }}r *{{ $tableNameCamel }}RltsRepository) {{ camelCase .Table.TableName }}Through{{ camelCase .ColumnName }}(ctx context.Context, obj *table.{{ $tableNameCamel }}, filter *table.{{ camelCase .Table.TableName }}Filter, pagination *internal.Pagination) (*table.List{{ camelCase .Table.TableName }}, error) {
     if obj ==  nil {
         return &table.List{{ camelCase .Table.TableName }}{}, nil
     }

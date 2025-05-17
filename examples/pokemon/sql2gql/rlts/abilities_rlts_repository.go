@@ -16,7 +16,7 @@ type IAbilitiesRltsRepository interface {
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
-	PokemonAbilitiesByFkAbility(ctx context.Context, obj *table.Abilities, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
+	PokemonAbilitiesThroughFkAbility(ctx context.Context, obj *table.Abilities, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
 }
 
 type AbilitiesRltsRepository struct {
@@ -28,7 +28,7 @@ var NewAbilitiesRltsRepository = wire.NewSet(
 	wire.Bind(new(IAbilitiesRltsRepository), new(*AbilitiesRltsRepository)),
 )
 
-func (ar *AbilitiesRltsRepository) PokemonAbilitiesByFkAbility(ctx context.Context, obj *table.Abilities, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error) {
+func (ar *AbilitiesRltsRepository) PokemonAbilitiesThroughFkAbility(ctx context.Context, obj *table.Abilities, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error) {
 	if obj == nil {
 		return &table.ListPokemonAbilities{}, nil
 	}

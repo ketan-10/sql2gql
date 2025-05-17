@@ -16,10 +16,10 @@ type IPokemonRltsRepository interface {
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
-	BaseStatsByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
-	PokemonAbilitiesByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
-	PokemonEvolutionMatchupByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
-	PokemonTypesByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
+	BaseStatsThroughFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error)
+	PokemonAbilitiesThroughFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error)
+	PokemonEvolutionMatchupThroughPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error)
+	PokemonTypesThroughPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
 }
 
 type PokemonRltsRepository struct {
@@ -37,25 +37,25 @@ var NewPokemonRltsRepository = wire.NewSet(
 	wire.Bind(new(IPokemonRltsRepository), new(*PokemonRltsRepository)),
 )
 
-func (pr *PokemonRltsRepository) BaseStatsByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error) {
+func (pr *PokemonRltsRepository) BaseStatsThroughFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error) {
 	if obj == nil {
 		return &table.ListBaseStats{}, nil
 	}
 	return pr.BaseStatsRepository.BaseStatsByFkPokemon(ctx, obj.ID, filter, pagination)
 }
-func (pr *PokemonRltsRepository) PokemonAbilitiesByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error) {
+func (pr *PokemonRltsRepository) PokemonAbilitiesThroughFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error) {
 	if obj == nil {
 		return &table.ListPokemonAbilities{}, nil
 	}
 	return pr.PokemonAbilitiesRepository.PokemonAbilitiesByFkPokemon(ctx, obj.ID, filter, pagination)
 }
-func (pr *PokemonRltsRepository) PokemonEvolutionMatchupByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error) {
+func (pr *PokemonRltsRepository) PokemonEvolutionMatchupThroughPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error) {
 	if obj == nil {
 		return &table.ListPokemonEvolutionMatchup{}, nil
 	}
 	return pr.PokemonEvolutionMatchupRepository.PokemonEvolutionMatchupByPokemonID(ctx, obj.ID, filter, pagination)
 }
-func (pr *PokemonRltsRepository) PokemonTypesByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error) {
+func (pr *PokemonRltsRepository) PokemonTypesThroughPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error) {
 	if obj == nil {
 		return &table.ListPokemonTypes{}, nil
 	}

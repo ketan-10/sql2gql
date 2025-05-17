@@ -30,9 +30,9 @@ type IAbilitiesRepository interface {
 	AbilitiesByAbilityName(ctx context.Context, abilityName string, filter *table.AbilitiesFilter, pagination *internal.Pagination) (*table.ListAbilities, error)
 
 	AbilitiesByAbilityNameWithSuffix(ctx context.Context, abilityName string, filter *table.AbilitiesFilter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.ListAbilities, error)
-	AbilitiesByID(ctx context.Context, iD int, filter *table.AbilitiesFilter) (table.Abilities, error)
+	AbilitiesByID(ctx context.Context, iD int, filter *table.AbilitiesFilter) (*table.Abilities, error)
 
-	AbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.AbilitiesFilter, suffixes ...sq.Sqlizer) (table.Abilities, error)
+	AbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.AbilitiesFilter, suffixes ...sq.Sqlizer) (*table.Abilities, error)
 }
 
 type IAbilitiesRepositoryQueryBuilder interface {
@@ -336,17 +336,17 @@ func (ar *AbilitiesRepository) AbilitiesByAbilityNameWithSuffix(ctx context.Cont
 	return &list, nil
 
 }
-func (ar *AbilitiesRepository) AbilitiesByID(ctx context.Context, iD int, filter *table.AbilitiesFilter) (table.Abilities, error) {
+func (ar *AbilitiesRepository) AbilitiesByID(ctx context.Context, iD int, filter *table.AbilitiesFilter) (*table.Abilities, error) {
 	return ar.AbilitiesByIDWithSuffix(ctx, iD, filter)
 }
 
-func (ar *AbilitiesRepository) AbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.AbilitiesFilter, suffixes ...sq.Sqlizer) (table.Abilities, error) {
+func (ar *AbilitiesRepository) AbilitiesByIDWithSuffix(ctx context.Context, iD int, filter *table.AbilitiesFilter, suffixes ...sq.Sqlizer) (*table.Abilities, error) {
 	var err error
 
 	// sql query
 	qb, err := ar.FindAllAbilitiesBaseQuery(ctx, filter, "`abilities`.*", suffixes...)
 	if err != nil {
-		return table.Abilities{}, err
+		return &table.Abilities{}, err
 	}
 	qb = qb.Where(sq.Eq{"`abilities`.`id`": iD})
 
@@ -354,7 +354,7 @@ func (ar *AbilitiesRepository) AbilitiesByIDWithSuffix(ctx context.Context, iD i
 	a := table.Abilities{}
 	err = ar.DB.Get(ctx, &a, qb)
 	if err != nil {
-		return table.Abilities{}, err
+		return &table.Abilities{}, err
 	}
-	return a, nil
+	return &a, nil
 }

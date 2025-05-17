@@ -13,7 +13,6 @@ scalar NullBool
 scalar Map
 scalar FilterOnField
 
-
 input Pagination {
     page: Int
     perPage: Int

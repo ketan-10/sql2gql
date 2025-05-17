@@ -44,5 +44,7 @@ func UppercaseFirst(s string) string {
 	if s == "id" {
 		return "ID"
 	}
-	return strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
+	r := []rune(s)
+	r[0] = unicode.ToUpper(r[0])
+	return string(r)
 }

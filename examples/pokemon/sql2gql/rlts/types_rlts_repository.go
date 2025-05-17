@@ -16,7 +16,7 @@ type ITypesRltsRepository interface {
 	// This Table Pointing to Other Table!!!, ManyToOne <- As Many records from other table can point to this table one record
 
 	//  Other Table Pointing to This Table!!!, OneToMany <- As This Table record can point to Multiple Other table record
-	PokemonTypesByTypeID(ctx context.Context, obj *table.Types, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
+	PokemonTypesThroughTypeID(ctx context.Context, obj *table.Types, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error)
 }
 
 type TypesRltsRepository struct {
@@ -28,7 +28,7 @@ var NewTypesRltsRepository = wire.NewSet(
 	wire.Bind(new(ITypesRltsRepository), new(*TypesRltsRepository)),
 )
 
-func (tr *TypesRltsRepository) PokemonTypesByTypeID(ctx context.Context, obj *table.Types, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error) {
+func (tr *TypesRltsRepository) PokemonTypesThroughTypeID(ctx context.Context, obj *table.Types, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error) {
 	if obj == nil {
 		return &table.ListPokemonTypes{}, nil
 	}
