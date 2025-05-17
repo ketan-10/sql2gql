@@ -78,12 +78,6 @@ func (db *DB) Select(ctx context.Context, dest interface{}, sqlizer sqrl.Sqlizer
 
 func (db *DB) Exec(ctx context.Context, sqlizer sqrl.Sqlizer) (sql.Result, error) {
 
-	// // If prod don't attempt exec, just write to file
-	// if getProdContext(ctx) {
-	// 	err := db.FileGen.Write(sqlizer)
-	// 	return nil, err
-	// }
-
 	query, args, err := sqlizer.ToSql()
 	if err != nil {
 		return nil, err
@@ -94,9 +88,6 @@ func (db *DB) Exec(ctx context.Context, sqlizer sqrl.Sqlizer) (sql.Result, error
 	if err != nil {
 		return nil, err
 	}
-
-	// // write to file if query was successful
-	// err = db.FileGen.Write(sqlizer)
 
 	return res, err
 }
