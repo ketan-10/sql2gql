@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ketan-10/mysql2graphql/loaders/models"
-	"github.com/ketan-10/mysql2graphql/templates"
+	"github.com/ketan-10/sql2gql/loaders/models"
+	"github.com/ketan-10/sql2gql/templates"
 )
 
 // DatabaseType enum currently only mysql is supported.

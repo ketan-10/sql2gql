@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ketan-10/mysql2graphql/utils"
+	"github.com/ketan-10/sql2gql/utils"
 )
 
 type Column struct {

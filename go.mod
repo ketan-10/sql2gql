@@ -1,4 +1,4 @@
-module github.com/ketan-10/mysql2graphql
+module github.com/ketan-10/sql2gql
 
 go 1.21.3
 

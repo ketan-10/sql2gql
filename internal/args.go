@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"text/template"
 
-	"github.com/ketan-10/mysql2graphql/templates"
+	"github.com/ketan-10/sql2gql/templates"
 )
 
 type Args struct {
@@ -21,7 +21,7 @@ type Args struct {
 
 func GetDefaultArgs() *Args {
 	return &Args{
-		GeneratedDir: "mysql2gql",
+		GeneratedDir: "sql2gql",
 	}
 }
 

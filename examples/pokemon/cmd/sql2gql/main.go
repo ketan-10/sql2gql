@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/ketan-10/mysql2graphql/cmd"
+	"github.com/ketan-10/sql2gql/cmd"
 )
 
 func main() {

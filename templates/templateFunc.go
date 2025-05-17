@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ketan-10/mysql2graphql/utils"
+	"github.com/ketan-10/sql2gql/utils"
 )
 
 var removeSpecialChar = regexp.MustCompile(`[^a-zA-Z0-9]`)

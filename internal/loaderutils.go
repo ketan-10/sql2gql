@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"github.com/ketan-10/mysql2graphql/loaders/models"
-	"github.com/ketan-10/mysql2graphql/utils"
+	"github.com/ketan-10/sql2gql/loaders/models"
+	"github.com/ketan-10/sql2gql/utils"
 )
 
 // --> input

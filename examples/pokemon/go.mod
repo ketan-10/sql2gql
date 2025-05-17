@@ -1,15 +1,15 @@
-module github.com/ketan-10/mysql2graphql/examples/pokemon
+module github.com/ketan-10/sql2gql/examples/pokemon
 
 go 1.24.3
 
-replace github.com/ketan-10/mysql2graphql => ../..
+replace github.com/ketan-10/sql2gql => ../..
 
-// replace github.com/ketan-10/mysql2graphql => ../mysql2graphql
+// replace github.com/ketan-10/sql2gql => ../sql2gql
 
 require (
 	github.com/99designs/gqlgen v0.17.73
 	github.com/google/wire v0.6.0
-	github.com/ketan-10/mysql2graphql v0.0.0-00010101000000-000000000000
+	github.com/ketan-10/sql2gql v0.0.0-00010101000000-000000000000
 	github.com/pressly/goose/v3 v3.24.3
 )
 

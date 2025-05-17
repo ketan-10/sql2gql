@@ -8,10 +8,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ketan-10/mysql2graphql/internal"
+	"github.com/ketan-10/sql2gql/internal"
 
 	// empty import, so that init method will be called, and drivers will be loaded, this has driver import
-	_ "github.com/ketan-10/mysql2graphql/loaders"
+	_ "github.com/ketan-10/sql2gql/loaders"
 )
 
 func Execute() {
