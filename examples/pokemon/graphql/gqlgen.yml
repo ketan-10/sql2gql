@@ -13,10 +13,10 @@ exec:
 model:
   filename: ./gen/models_gen.go
 
-# Where should the resolver implementations go?
-resolver:
-  filename: ./resolver.go
-  type: Resolver
+# # Where should the resolver implementations go?
+# resolver:
+#   filename: ./resolver.go
+#   type: Resolver
 
 models:
   Pagination:
