@@ -22,7 +22,7 @@ func SnakeToCamel(name string) string {
 		if word == "" {
 			continue
 		}
-		result += strings.ToUpper(word[:1]) + strings.ToLower(word[1:])
+		result += UppercaseFirst(word)
 	}
 	return result
 }
@@ -35,4 +35,14 @@ func LowCaseFirst(s string) string {
 	r := []rune(s)
 	r[0] = unicode.ToLower(r[0])
 	return string(r)
+}
+
+func UppercaseFirst(s string) string {
+	if s == "" {
+		return ""
+	}
+	if s == "id" {
+		return "ID"
+	}
+	return strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
 }

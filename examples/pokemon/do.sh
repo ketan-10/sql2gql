@@ -1,28 +1,13 @@
 source ./docker/docker.env
 
-runMigration() {
-    
-    if [[ -z $1 ]]; then
-        echo "database required"
-        exit 2
-    fi
-    database=$1
-    
-    dir=migrations
-    if [[ $2 ]]; then
-        dir=$2
-    fi
-
-    # ${binary} -dir ${dir} mysql "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(127.0.0.1:3306)/${database}?charset=utf8mb4&parseTime=true" up
-    go run github.com/pressly/goose/v3/cmd/goose -dir ${dir} mysql "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(127.0.0.1:3306)/${database}?charset=utf8mb4&parseTime=true" up
-}
 
 cleanMigrate() {
-    echo "re-creating database and running db migration with goose on migration folder..."
 
     docker exec -i db bash -c "mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'DROP DATABASE ${MYSQL_DATABASE};'"
     docker exec -i db bash -c "mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE ${MYSQL_DATABASE} CHARSET=utf8mb4;'"
-    runMigration ${MYSQL_DATABASE}
+    
+    dir=migrations
+    cat ${dir}/*.sql | docker exec -i db bash -c "mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} --default-character-set=utf8mb4 ${MYSQL_DATABASE}"
     
     echo "Migration complete."
 }
@@ -64,9 +49,7 @@ wire() {
     echo "wire completed"
 }
 
-if [[ $1 = 'migrate' ]]; then
-    runMigration ${MYSQL_DATABASE}  
-elif [[ $1 = 'cleanMigrate' ]]; then
+if [[ $1 = 'cleanMigrate' ]]; then
     cleanMigrate
 elif [[ $1 = 'sql2gql' ]]; then
     sql2gql
@@ -78,6 +61,8 @@ elif [[ $1 = 'gqlgen' ]]; then
     gqlgen
 elif [[ $1 = 'wire' ]]; then
     wire
+elif [[ $1 = 'run' ]]; then
+    go run main.go --connection "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(127.0.0.1:3306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=true"
 elif [[ $1 = 'all' ]]; then
     cleanMigrate
     sql2gql

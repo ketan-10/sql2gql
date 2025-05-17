@@ -22,13 +22,13 @@ type I{{ $tableNameCamel }}Repository interface {
     
     Insert{{ $tableNameCamel }}(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}Create) (*table.{{ $tableNameCamel }}, error)
     Insert{{ $tableNameCamel }}WithSuffix(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}Create, suffix sq.Sqlizer) (*table.{{ $tableNameCamel }}, error)
-    Insert{{ $tableNameCamel }}IdResult(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}Create, suffix sq.Sqlizer) (int64, error)
+    Insert{{ $tableNameCamel }}IDResult(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}Create, suffix sq.Sqlizer) (int64, error)
 
     Update{{ $tableNameCamel }}ByFields(ctx context.Context, id {{ $idType }}, {{ $shortName }} table.{{ $tableNameCamel }}Update) (*table.{{ $tableNameCamel }}, error)
     Update{{ $tableNameCamel }}(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}) (*table.{{ $tableNameCamel }}, error)
     
     Delete{{ $tableNameCamel }}(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}) error
-    Delete{{ $tableNameCamel }}ById(ctx context.Context, id {{ $idType }}) (bool, error)
+    Delete{{ $tableNameCamel }}ByID(ctx context.Context, id {{ $idType }}) (bool, error)
     
     FindAll{{ $tableNameCamel }}(ctx context.Context, {{ $shortName }} *table.{{ $tableNameCamel }}Filter, pagination *internal.Pagination) (*table.List{{ $tableNameCamel }}, error)
     FindAll{{ $tableNameCamel }}WithSuffix(ctx context.Context,{{ $shortName }} *table.{{ $tableNameCamel }}Filter, pagination *internal.Pagination, suffixes ...sq.Sqlizer) (*table.List{{ $tableNameCamel }}, error)
@@ -86,7 +86,7 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Insert{{ $tableNameCam
 func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Insert{{ $tableNameCamel }}WithSuffix(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}Create, suffix sq.Sqlizer) (*table.{{ $tableNameCamel }}, error) {
     var err error
     
-    id, err := {{ $shortName }}r.Insert{{ $tableNameCamel }}IdResult(ctx, {{ $shortName }}, suffix)
+    id, err := {{ $shortName }}r.Insert{{ $tableNameCamel }}IDResult(ctx, {{ $shortName }}, suffix)
     if err != nil {
         return nil, err
     }
@@ -102,7 +102,7 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Insert{{ $tableNameCam
     return &new{{ $shortName }}, nil
 }
 
-func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Insert{{ $tableNameCamel }}IdResult(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}Create, suffix sq.Sqlizer) (int64, error) {
+func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Insert{{ $tableNameCamel }}IDResult(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}Create, suffix sq.Sqlizer) (int64, error) {
     var err error
 
     qb := sq.Insert("`{{ .Table.TableName }}`").Columns(
@@ -186,7 +186,7 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Update{{ $tableNameCam
         "`{{ .ColumnName }}`": {{ $shortName }}.{{ camelCase .ColumnName }},
         {{- end }}
     {{- end }}
-    }).Where(sq.Eq{"`id`": {{ $shortName }}.Id})
+    }).Where(sq.Eq{"`id`": {{ $shortName }}.ID})
 
     // run query
     _, err = {{ $shortName }}r.DB.Exec(ctx, qb)
@@ -195,7 +195,7 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Update{{ $tableNameCam
     }
 
     selectQb := sq.Select("*").From("`{{ .Table.TableName }}`")
-    selectQb = selectQb.Where(sq.Eq{"`id`": {{ $shortName }}.Id})
+    selectQb = selectQb.Where(sq.Eq{"`id`": {{ $shortName }}.ID})
     
     result := table.{{ $tableNameCamel }}{}
     err = {{ $shortName }}r.DB.Get(ctx, &result, selectQb)
@@ -208,12 +208,12 @@ func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Update{{ $tableNameCam
 
 
 func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Delete{{ $tableNameCamel }}(ctx context.Context, {{ $shortName }} table.{{ $tableNameCamel }}) (error) {
-    _, err := {{ $shortName }}r.Delete{{ $tableNameCamel }}ById(ctx, {{ $shortName }}.Id)
+    _, err := {{ $shortName }}r.Delete{{ $tableNameCamel }}ByID(ctx, {{ $shortName }}.ID)
     return err
 }
 
 
-func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Delete{{ $tableNameCamel }}ById(ctx context.Context, id {{ $idType }}) (bool, error) {
+func ({{ $shortName }}r *{{ $tableNameCamel }}Repository) Delete{{ $tableNameCamel }}ByID(ctx context.Context, id {{ $idType }}) (bool, error) {
     var err error
 
     qb := sq.Update("`{{ .Table.TableName }}`").Set("active", false)

@@ -1,0 +1,144 @@
+package graphql
+
+// THIS CODE WILL BE UPDATED WITH SCHEMA CHANGES. PREVIOUS IMPLEMENTATION FOR SCHEMA CHANGES WILL BE KEPT IN THE COMMENT SECTION. IMPLEMENTATION FOR UNCHANGED SCHEMA WILL BE KEPT.
+
+import (
+	"context"
+
+	"github.com/ketan-10/sql2gql/examples/pokemon/graphql/gen"
+	"github.com/ketan-10/sql2gql/examples/pokemon/internal"
+	"github.com/ketan-10/sql2gql/examples/pokemon/sql2gql/table"
+)
+
+type Resolver struct{}
+
+
+// PokemonAbilitiesByFkAbility is the resolver for the pokemonAbilitiesByFkAbility field.
+func (r *abilitiesResolver) PokemonAbilitiesByFkAbility(ctx context.Context, obj *table.Abilities, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error) {
+	panic("not implemented")
+}
+
+// PokemonByFkPokemon is the resolver for the pokemonByFkPokemon field.
+func (r *baseStatsResolver) PokemonByFkPokemon(ctx context.Context, obj *table.BaseStats, filter *table.PokemonFilter) (*table.Pokemon, error) {
+	panic("not implemented")
+}
+
+// BaseStatsByFkPokemon is the resolver for the baseStatsByFkPokemon field.
+func (r *pokemonResolver) BaseStatsByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.BaseStatsFilter, pagination *internal.Pagination) (*table.ListBaseStats, error) {
+	panic("not implemented")
+}
+
+// PokemonAbilitiesByFkPokemon is the resolver for the pokemonAbilitiesByFkPokemon field.
+func (r *pokemonResolver) PokemonAbilitiesByFkPokemon(ctx context.Context, obj *table.Pokemon, filter *table.PokemonAbilitiesFilter, pagination *internal.Pagination) (*table.ListPokemonAbilities, error) {
+	panic("not implemented")
+}
+
+// PokemonEvolutionMatchupByPokemonID is the resolver for the pokemonEvolutionMatchupByPokemonID field.
+func (r *pokemonResolver) PokemonEvolutionMatchupByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonEvolutionMatchupFilter, pagination *internal.Pagination) (*table.ListPokemonEvolutionMatchup, error) {
+	panic("not implemented")
+}
+
+// PokemonTypesByPokemonID is the resolver for the pokemonTypesByPokemonID field.
+func (r *pokemonResolver) PokemonTypesByPokemonID(ctx context.Context, obj *table.Pokemon, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error) {
+	panic("not implemented")
+}
+
+// PokemonByFkPokemon is the resolver for the pokemonByFkPokemon field.
+func (r *pokemonAbilitiesResolver) PokemonByFkPokemon(ctx context.Context, obj *table.PokemonAbilities, filter *table.PokemonFilter) (*table.Pokemon, error) {
+	panic("not implemented")
+}
+
+// AbilitiesByFkAbility is the resolver for the abilitiesByFkAbility field.
+func (r *pokemonAbilitiesResolver) AbilitiesByFkAbility(ctx context.Context, obj *table.PokemonAbilities, filter *table.AbilitiesFilter) (*table.Abilities, error) {
+	panic("not implemented")
+}
+
+// PokemonEvolutionMatchupByEvolvedSpeciesID is the resolver for the pokemonEvolutionMatchupByEvolvedSpeciesID field.
+func (r *pokemonEvolutionResolver) PokemonEvolutionMatchupByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolution, filter *table.PokemonEvolutionMatchupFilter) (*table.PokemonEvolutionMatchup, error) {
+	panic("not implemented")
+}
+
+// PokemonByPokemonID is the resolver for the pokemonByPokemonID field.
+func (r *pokemonEvolutionMatchupResolver) PokemonByPokemonID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonFilter) (*table.Pokemon, error) {
+	panic("not implemented")
+}
+
+// PokemonEvolutionByEvolvedSpeciesID is the resolver for the pokemonEvolutionByEvolvedSpeciesID field.
+func (r *pokemonEvolutionMatchupResolver) PokemonEvolutionByEvolvedSpeciesID(ctx context.Context, obj *table.PokemonEvolutionMatchup, filter *table.PokemonEvolutionFilter, pagination *internal.Pagination) (*table.ListPokemonEvolution, error) {
+	panic("not implemented")
+}
+
+// PokemonByPokemonID is the resolver for the pokemonByPokemonID field.
+func (r *pokemonTypesResolver) PokemonByPokemonID(ctx context.Context, obj *table.PokemonTypes, filter *table.PokemonFilter) (*table.Pokemon, error) {
+	panic("not implemented")
+}
+
+// TypesByTypeID is the resolver for the typesByTypeID field.
+func (r *pokemonTypesResolver) TypesByTypeID(ctx context.Context, obj *table.PokemonTypes, filter *table.TypesFilter) (*table.Types, error) {
+	panic("not implemented")
+}
+
+// FindAllPokemon is the resolver for the findAllPokemon field.
+func (r *queryResolver) FindAllPokemon(ctx context.Context, filter *table.PokemonFilter, pagination *internal.Pagination) (*table.ListPokemon, error) {
+	panic("not implemented")
+}
+
+// PokemonTypesByTypeID is the resolver for the pokemonTypesByTypeID field.
+func (r *typesResolver) PokemonTypesByTypeID(ctx context.Context, obj *table.Types, filter *table.PokemonTypesFilter, pagination *internal.Pagination) (*table.ListPokemonTypes, error) {
+	panic("not implemented")
+}
+
+// Abilities returns gen.AbilitiesResolver implementation.
+func (r *Resolver) Abilities() gen.AbilitiesResolver { return &abilitiesResolver{r} }
+
+// BaseStats returns gen.BaseStatsResolver implementation.
+func (r *Resolver) BaseStats() gen.BaseStatsResolver { return &baseStatsResolver{r} }
+
+// Pokemon returns gen.PokemonResolver implementation.
+func (r *Resolver) Pokemon() gen.PokemonResolver { return &pokemonResolver{r} }
+
+// PokemonAbilities returns gen.PokemonAbilitiesResolver implementation.
+func (r *Resolver) PokemonAbilities() gen.PokemonAbilitiesResolver {
+	return &pokemonAbilitiesResolver{r}
+}
+
+// PokemonEvolution returns gen.PokemonEvolutionResolver implementation.
+func (r *Resolver) PokemonEvolution() gen.PokemonEvolutionResolver {
+	return &pokemonEvolutionResolver{r}
+}
+
+// PokemonEvolutionMatchup returns gen.PokemonEvolutionMatchupResolver implementation.
+func (r *Resolver) PokemonEvolutionMatchup() gen.PokemonEvolutionMatchupResolver {
+	return &pokemonEvolutionMatchupResolver{r}
+}
+
+// PokemonTypes returns gen.PokemonTypesResolver implementation.
+func (r *Resolver) PokemonTypes() gen.PokemonTypesResolver { return &pokemonTypesResolver{r} }
+
+// Query returns gen.QueryResolver implementation.
+func (r *Resolver) Query() gen.QueryResolver { return &queryResolver{r} }
+
+// Types returns gen.TypesResolver implementation.
+func (r *Resolver) Types() gen.TypesResolver { return &typesResolver{r} }
+
+type abilitiesResolver struct{ *Resolver }
+type baseStatsResolver struct{ *Resolver }
+type pokemonResolver struct{ *Resolver }
+type pokemonAbilitiesResolver struct{ *Resolver }
+type pokemonEvolutionResolver struct{ *Resolver }
+type pokemonEvolutionMatchupResolver struct{ *Resolver }
+type pokemonTypesResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+type typesResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	type Resolver struct {
+	sql2gql.GoResolver
+}
+*/

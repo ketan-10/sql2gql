@@ -85,8 +85,8 @@ func generateFiles(args *internal.Args) {
 }
 
 // uriToGoDSN converts connection string to a Go DSN.
-// ex: mysql://bob:password@127.0.0.1:3306/training?charset=utf8mb4&parseTime=true
-// -> bob:password@tcp(127.0.0.1:3306)/training?charset=utf8mb4&parseTime=true
+// ex: mysql://user:password@127.0.0.1:3306/database?charset=utf8mb4&parseTime=true
+// -> user:password@tcp(127.0.0.1:3306)/database?charset=utf8mb4&parseTime=true
 func uriToGoDSN(uri string) (string, error) {
 	u, err := url.Parse(uri)
 	if err != nil {
