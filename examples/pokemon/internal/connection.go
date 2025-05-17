@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"time"
 
 	"github.com/elgris/sqrl"
 	"github.com/google/wire"
@@ -39,6 +40,9 @@ func OpenConnection(ctx context.Context, options *DBOptions) *DB {
 	}
 
 	sqlxDB, err := sqlx.Open("mysql", connection)
+	sqlxDB.SetMaxOpenConns(50)      // no more than 50 open at once
+	sqlxDB.SetMaxIdleConns(25)      // keep up to 25 idle
+	sqlxDB.SetConnMaxLifetime(30 * time.Minute)
 	if err != nil {
 		log.Fatal(err)
 	}
